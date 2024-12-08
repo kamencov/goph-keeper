@@ -105,6 +105,11 @@ func (p *Postgresql) createTableIfNotExists() (err error) {
 	return nil
 }
 
+// Close закрывает соединение с базой данных.
+func (p *Postgresql) Close() error {
+	return p.storage.Close()
+}
+
 // CheckUser - проверяет, существует ли пользователь в базе данных
 func (p *Postgresql) CheckUser(ctx context.Context, login string) error {
 	query := "SELECT login FROM users WHERE login = $1"

@@ -7,6 +7,8 @@ import (
 )
 
 // storageAuth - интерфейс сервиса авторизации.
+//
+//go:generate mockgen -source=service.go -destination=service_mock.go -package=auth
 type storageAuth interface {
 	CheckUser(ctx context.Context, login string) error
 	CheckPassword(login string) (string, bool)

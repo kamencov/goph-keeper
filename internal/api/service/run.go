@@ -9,6 +9,9 @@ import (
 	serviceAuth "goph-keeper/internal/services/auth"
 	"log/slog"
 	"net"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -27,6 +30,13 @@ func Run(log *slog.Logger) error {
 		log.Error("failed to initialize connection to database", err)
 		return err
 	}
+
+	defer func(storage repo) {
+		err := storage.Close()
+		if err != nil {
+
+		}
+	}(storage)
 
 	// Создаем сервисы
 	newServiceAuth := serviceAuth.NewServiceAuth(
@@ -48,18 +58,29 @@ func Run(log *slog.Logger) error {
 	pd.RegisterRegisterServer(grpcServer, registerUser)
 	pd.RegisterAuthServer(grpcServer, authUser)
 
-	listener, err := net.Listen("tcp", flags.AddrGRPC)
-	if err != nil {
-		log.Error("failed to listen", err)
-		return err
-	}
+	go func() {
+		listener, err := net.Listen("tcp", flags.AddrGRPC)
+		if err != nil {
+			log.Error("failed to listen", err)
+			return
+		}
+		log.Info("application run")
+		if err := grpcServer.Serve(listener); err != nil {
+			slog.Error("failed to serve", err)
+			return
+		}
 
-	if err := grpcServer.Serve(listener); err != nil {
-		slog.Error("failed to serve", err)
-		return err
-	}
+		return
+	}()
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
+
+	<-stop
 
 	grpcServer.GracefulStop()
+
+	log.Info("application stop")
 
 	return nil
 }

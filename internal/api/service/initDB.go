@@ -14,6 +14,7 @@ type repo interface {
 	SaveUser(ctx context.Context, login, hashPassword string) error
 	SaveTableUserAndUpdateToken(login, accessToken string) error
 	GetUserID(ctx context.Context, login string) (int, error)
+	Close() error
 }
 
 func initDB(log *slog.Logger, f *Flags) (repo, error) {

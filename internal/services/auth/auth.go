@@ -16,19 +16,19 @@ type AccessTokenClaims struct {
 }
 
 var (
-	errNotFoundPassword = errors.New("not found password")
-	errWrongPassword    = errors.New("wrong password")
+	ErrNotFoundLogin = errors.New("not found password")
+	ErrWrongPassword = errors.New("wrong password")
 )
 
 // Auth - авторизация пользователя.
 func (s *ServiceAuth) Auth(login, password string) (Tokens, error) {
 	passwordHash, ok := s.storage.CheckPassword(login)
 	if !ok {
-		return Tokens{}, errNotFoundPassword
+		return Tokens{}, ErrNotFoundLogin
 	}
 
 	if !s.doPasswordMatch(passwordHash, password) {
-		return Tokens{}, errWrongPassword
+		return Tokens{}, ErrWrongPassword
 	}
 
 	token, err := s.generateToken(login)

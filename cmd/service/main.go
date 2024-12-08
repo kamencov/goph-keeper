@@ -13,7 +13,10 @@ const (
 
 func main() {
 
+	// создаем логгер
 	log := setupLogger(envLocal)
+
+	// запускаем приложение
 	if err := service.Run(log); err != nil {
 		panic(err)
 	}

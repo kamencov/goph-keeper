@@ -19,6 +19,11 @@ func NewMemory(log *slog.Logger) *Memory {
 	}
 }
 
+// Close закрывает хранилище.
+func (m *Memory) Close() error {
+	return nil
+}
+
 func (m *Memory) CheckUser(ctx context.Context, login string) error {
 	return nil
 }

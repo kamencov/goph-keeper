@@ -11,6 +11,8 @@ import (
 )
 
 // serviceRegister - интерфейс на сервисный слой.
+//
+//go:generate mockgen -source=handlers.go -destination=handlers_mock.go -package=register
 type serviceRegister interface {
 	RegisterUser(ctx context.Context, login, password string) (int, error)
 }
@@ -42,7 +44,7 @@ func (h *Handlers) Register(ctx context.Context, in *pd.RegisterRequest) (*pd.Re
 			h.log.Error("failed, the user already exists", "error", err)
 			return nil, status.Errorf(codes.AlreadyExists, "the user already exists")
 		}
-		h.log.Error("failed to register user", err)
+		h.log.Error("failed to register user", "error", err)
 		return nil, status.Errorf(codes.Internal, "failed to register user")
 	}
 
