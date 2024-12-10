@@ -23,7 +23,6 @@ func NewMemory(log *slog.Logger) *Memory {
 func (m *Memory) Close() error {
 	return nil
 }
-
 func (m *Memory) CheckUser(ctx context.Context, login string) error {
 	return nil
 }
@@ -36,7 +35,19 @@ func (m *Memory) SaveUser(ctx context.Context, login, hashPassword string) error
 func (m *Memory) SaveTableUserAndUpdateToken(login, accessToken string) error {
 	return nil
 }
-func (m *Memory) SaveLoginAndPasswordInCredentials(ctx context.Context, resource string, loginID int, password string) error {
+func (m *Memory) SaveLoginAndPasswordInCredentials(ctx context.Context, userID int, resource string, login string, password string) error {
 	return nil
 }
-func (m *Memory) GetUserID(ctx context.Context, login string) (int, error) { return -1, nil }
+func (m *Memory) SaveTextData(ctx context.Context, userID int, data string) error {
+	return nil
+}
+func (m *Memory) SaveBinaryData(ctx context.Context, uid int, data string) error { return nil }
+func (m *Memory) SaveCards(ctx context.Context, userID int, cards string) error {
+	return nil
+}
+func (m *Memory) GetUserIDByToken(ctx context.Context, token string) (int, error) {
+	return -1, nil
+}
+func (m *Memory) GetUserIDByLogin(ctx context.Context, login string) (int, error) {
+	return -1, nil
+}

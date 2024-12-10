@@ -4,11 +4,17 @@ import (
 	"google.golang.org/grpc"
 	_ "google.golang.org/grpc/encoding/gzip"
 	handlerAuth "goph-keeper/internal/grpc/auth"
+	handlerBinaryData "goph-keeper/internal/grpc/binary_data"
+	handlerCards "goph-keeper/internal/grpc/cards"
 	handlerCredentials "goph-keeper/internal/grpc/credentials"
 	handlerRegister "goph-keeper/internal/grpc/register"
+	handlerTextData "goph-keeper/internal/grpc/text_data"
 	pd "goph-keeper/internal/proto/v1"
 	serviceAuth "goph-keeper/internal/services/auth"
+	binaryData "goph-keeper/internal/services/binary_data"
+	"goph-keeper/internal/services/cards"
 	"goph-keeper/internal/services/credentials"
+	textData "goph-keeper/internal/services/text_data"
 	"log/slog"
 	"net"
 	"os"
@@ -48,13 +54,18 @@ func Run(log *slog.Logger) error {
 		log,
 		storage,
 	)
-	
 	newServiceCredentials := credentials.NewService(log, storage)
+	newServiceTextData := textData.NewService(log, storage)
+	newServiceBinaryData := binaryData.NewService(log, storage)
+	newServiceCards := cards.NewServiceCards(log, storage)
 
 	// Создаем grpc
 	registerUser := handlerRegister.NewHandlers(log, newServiceAuth)
 	authUser := handlerAuth.NewHandlers(log, newServiceAuth)
 	postCredentials := handlerCredentials.NewHandlers(log, newServiceCredentials)
+	postTextData := handlerTextData.NewHandlers(log, newServiceTextData)
+	postBinaryData := handlerBinaryData.NewHandlers(log, newServiceBinaryData)
+	postCards := handlerCards.NewHandlers(log, newServiceCards)
 
 	// Создаем GRPC-сервер
 	grpcServer := grpc.NewServer()
@@ -63,6 +74,9 @@ func Run(log *slog.Logger) error {
 	pd.RegisterRegisterServer(grpcServer, registerUser)
 	pd.RegisterAuthServer(grpcServer, authUser)
 	pd.RegisterPostCredentialsServer(grpcServer, postCredentials)
+	pd.RegisterPostTextDataServer(grpcServer, postTextData)
+	pd.RegisterPostBinaryDataServer(grpcServer, postBinaryData)
+	pd.RegisterPostCardsServer(grpcServer, postCards)
 
 	go func() {
 		listener, err := net.Listen("tcp", flags.AddrGRPC)

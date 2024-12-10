@@ -14,7 +14,8 @@ type storageAuth interface {
 	CheckPassword(login string) (string, bool)
 	SaveUser(ctx context.Context, login, hashPassword string) error
 	SaveTableUserAndUpdateToken(login, accessToken string) error
-	GetUserID(ctx context.Context, login string) (int, error)
+	GetUserIDByLogin(ctx context.Context, login string) (int, error)
+	GetUserIDByToken(ctx context.Context, token string) (int, error)
 }
 
 // ServiceAuth - сервис авторизации.

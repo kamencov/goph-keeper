@@ -35,6 +35,16 @@ message PostTextDataRequest {
   string data = 2;
 }
 
+message PostBinaryDataRequest {
+  reserved 1;
+  bytes data = 2;
+}
+
+message PostCardsRequest {
+  reserved 1;
+  string data = 2;
+}
+
 message Empty {
   string message = 1;
 }
@@ -53,4 +63,12 @@ service PostCredentials {
 
 service PostTextData{
   rpc PostTextData(PostTextDataRequest) returns (Empty);
+}
+
+service PostBinaryData{
+  rpc PostBinaryData(PostTextDataRequest) returns (Empty);
+}
+
+service PostCards{
+  rpc PostCards(PostTextDataRequest) returns (Empty);
 }

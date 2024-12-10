@@ -5,21 +5,25 @@ import (
 	"errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"goph-keeper/internal/middleware"
 	pd "goph-keeper/internal/proto/v1"
 	"goph-keeper/internal/services/credentials"
 	"log/slog"
 )
 
+// service - интерфейс сервисного слоя.
 type serviceCredentials interface {
-	SaveLoginAndPassword(ctx context.Context, info, login, password string) error
+	SaveLoginAndPassword(ctx context.Context, userID int, info, login, password string) error
 }
 
+// Handlers - структура ручки сохранения пароля и логина от ресурса.
 type Handlers struct {
 	pd.UnimplementedPostCredentialsServer
 	log     *slog.Logger
 	service serviceCredentials
 }
 
+// NewHandlers - конструктор ручки запроса сохранения в базу пароль и логин от сервиса.
 func NewHandlers(log *slog.Logger, service serviceCredentials) *Handlers {
 	return &Handlers{
 		log:     log,
@@ -27,7 +31,7 @@ func NewHandlers(log *slog.Logger, service serviceCredentials) *Handlers {
 	}
 }
 
-// PostLoginAndPassword сохраняет логин и пароль
+// PostLoginAndPassword сохраняет логин и пароль.
 func (h *Handlers) PostLoginAndPassword(ctx context.Context, in *pd.PostLoginAndPasswordRequest) (*pd.Empty, error) {
 
 	if in.Password == "" || in.Login == "" {
@@ -35,7 +39,9 @@ func (h *Handlers) PostLoginAndPassword(ctx context.Context, in *pd.PostLoginAnd
 		return nil, status.Errorf(codes.InvalidArgument, "password or login is empty")
 	}
 
-	err := h.service.SaveLoginAndPassword(ctx, in.GetResource(), in.GetLogin(), in.GetPassword())
+	userID := ctx.Value(middleware.UserIDContextKey).(int)
+
+	err := h.service.SaveLoginAndPassword(ctx, userID, in.GetResource(), in.GetLogin(), in.GetPassword())
 
 	if err != nil {
 		if errors.Is(err, credentials.ErrNotFoundUser) {

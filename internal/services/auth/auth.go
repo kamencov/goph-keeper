@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"errors"
 	"github.com/golang-jwt/jwt/v4"
 	"time"
@@ -83,4 +84,13 @@ func (s *ServiceAuth) generateAccessToken(login string) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+func (s *ServiceAuth) ValidateToken(ctx context.Context, token string) (int, error) {
+	uid, err := s.storage.GetUserIDByToken(ctx, token)
+	if err != nil {
+		return -1, err
+	}
+
+	return uid, nil
 }

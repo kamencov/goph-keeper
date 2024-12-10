@@ -1,8 +1,12 @@
 package text_data
 
-import "log/slog"
+import (
+	"context"
+	"log/slog"
+)
 
 type storageTextData interface {
+	SaveTextData(ctx context.Context, userID int, data string) error
 }
 
 type Service struct {

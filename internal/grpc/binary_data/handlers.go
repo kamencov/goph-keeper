@@ -1,4 +1,4 @@
-package text_data
+package binary_data
 
 import (
 	"context"
@@ -11,17 +11,17 @@ import (
 
 // service - интерфейс сервисного слоя.
 type service interface {
-	SaveTextData(ctx context.Context, userID int, data string) error
+	SaveBinaryData(ctx context.Context, userID int, data string) error
 }
 
-// Handlers - структура ручки сохранения текста.
+// Handlers - структура ручки сохранения бинарных данных.
 type Handlers struct {
-	pd.UnimplementedPostTextDataServer
-	log     *slog.Logger
+	pd.UnimplementedPostBinaryDataServer
 	service service
+	log     *slog.Logger
 }
 
-// NewHandlers - конструктор ручки запроса сохранения в базу данных текста.
+// NewHandlers - конструктор ручки запроса сохранения в базу бинарные данные.
 func NewHandlers(log *slog.Logger, service service) *Handlers {
 	return &Handlers{
 		log:     log,
@@ -29,8 +29,8 @@ func NewHandlers(log *slog.Logger, service service) *Handlers {
 	}
 }
 
-// PostTextData - обрабатывает запрос сохранения.
-func (h *Handlers) PostTextData(ctx context.Context, in *pd.PostTextDataRequest) (*pd.Empty, error) {
+// PostBinaryData - обрабатывает запрос сохранения.
+func (h *Handlers) PostBinaryData(ctx context.Context, in *pd.PostTextDataRequest) (*pd.Empty, error) {
 	if in.Data == "" {
 		h.log.Error("data is empty")
 		return nil, status.Errorf(codes.InvalidArgument, "data is empty")
@@ -38,7 +38,7 @@ func (h *Handlers) PostTextData(ctx context.Context, in *pd.PostTextDataRequest)
 
 	userID := ctx.Value(middleware.UserIDContextKey).(int)
 
-	err := h.service.SaveTextData(ctx, userID, in.GetData())
+	err := h.service.SaveBinaryData(ctx, userID, in.GetData())
 
 	if err != nil {
 		h.log.Error("failed to save login and password", "error", err)

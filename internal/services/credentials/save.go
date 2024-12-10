@@ -10,14 +10,9 @@ var (
 )
 
 // SaveLoginAndPassword сохраняет логин и пароль от ресурса.
-func (s *Service) SaveLoginAndPassword(ctx context.Context, resource, login, password string) error {
+func (s *Service) SaveLoginAndPassword(ctx context.Context, userID int, resource, login, password string) error {
 
-	loginID, err := s.storage.GetUserID(ctx, login)
-	if err != nil {
-		return ErrNotFoundUser
-	}
-
-	err = s.storage.SaveLoginAndPasswordInCredentials(ctx, resource, loginID, password)
+	err = s.storage.SaveLoginAndPasswordInCredentials(ctx, userID, resource, login, password)
 	if err != nil {
 		return err
 	}

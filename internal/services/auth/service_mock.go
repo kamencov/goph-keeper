@@ -63,19 +63,34 @@ func (mr *MockstorageAuthMockRecorder) CheckUser(ctx, login interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUser", reflect.TypeOf((*MockstorageAuth)(nil).CheckUser), ctx, login)
 }
 
-// GetUserID mocks base method.
-func (m *MockstorageAuth) GetUserID(ctx context.Context, login string) (int, error) {
+// GetUserIDByLogin mocks base method.
+func (m *MockstorageAuth) GetUserIDByLogin(ctx context.Context, login string) (int, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUserID", ctx, login)
+	ret := m.ctrl.Call(m, "GetUserIDByLogin", ctx, login)
 	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetUserID indicates an expected call of GetUserID.
-func (mr *MockstorageAuthMockRecorder) GetUserID(ctx, login interface{}) *gomock.Call {
+// GetUserIDByLogin indicates an expected call of GetUserIDByLogin.
+func (mr *MockstorageAuthMockRecorder) GetUserIDByLogin(ctx, login interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserID", reflect.TypeOf((*MockstorageAuth)(nil).GetUserID), ctx, login)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserIDByLogin", reflect.TypeOf((*MockstorageAuth)(nil).GetUserIDByLogin), ctx, login)
+}
+
+// GetUserIDByToken mocks base method.
+func (m *MockstorageAuth) GetUserIDByToken(ctx context.Context, token string) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserIDByToken", ctx, token)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserIDByToken indicates an expected call of GetUserIDByToken.
+func (mr *MockstorageAuthMockRecorder) GetUserIDByToken(ctx, token interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserIDByToken", reflect.TypeOf((*MockstorageAuth)(nil).GetUserIDByToken), ctx, token)
 }
 
 // SaveTableUserAndUpdateToken mocks base method.

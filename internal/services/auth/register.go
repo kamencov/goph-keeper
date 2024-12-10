@@ -21,7 +21,7 @@ func (s *ServiceAuth) RegisterUser(ctx context.Context, login, password string) 
 		return -1, err
 	}
 
-	uid, err := s.storage.GetUserID(ctx, login)
+	uid, err := s.storage.GetUserIDByLogin(ctx, login)
 	if err != nil {
 		return -1, err
 	}

@@ -6,8 +6,7 @@ import (
 )
 
 type credentials interface {
-	SaveLoginAndPasswordInCredentials(ctx context.Context, resource string, loginID int, password string) error
-	GetUserID(ctx context.Context, login string) (int, error)
+	SaveLoginAndPasswordInCredentials(ctx context.Context, userID int, resource, login, password string) error
 }
 
 type Service struct {
