@@ -30,6 +30,11 @@ message PostLoginAndPasswordRequest {
   string password = 3;
 }
 
+message PostTextDataRequest {
+  reserved 1;
+  string data = 2;
+}
+
 message Empty {
   string message = 1;
 }
@@ -42,6 +47,10 @@ service Auth {
   rpc Auth(AuthRequest) returns (AuthResponse);
 }
 
-service Post {
+service PostCredentials {
   rpc PostLoginAndPassword(PostLoginAndPasswordRequest) returns (Empty);
+}
+
+service PostTextData{
+  rpc PostTextData(PostTextDataRequest) returns (Empty);
 }

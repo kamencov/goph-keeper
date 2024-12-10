@@ -4,9 +4,11 @@ import (
 	"google.golang.org/grpc"
 	_ "google.golang.org/grpc/encoding/gzip"
 	handlerAuth "goph-keeper/internal/grpc/auth"
+	handlerCredentials "goph-keeper/internal/grpc/credentials"
 	handlerRegister "goph-keeper/internal/grpc/register"
 	pd "goph-keeper/internal/proto/v1"
 	serviceAuth "goph-keeper/internal/services/auth"
+	"goph-keeper/internal/services/credentials"
 	"log/slog"
 	"net"
 	"os"
@@ -27,7 +29,7 @@ func Run(log *slog.Logger) error {
 	// Подключаемся к базе данных
 	storage, err := initDB(log, flags)
 	if err != nil {
-		log.Error("failed to initialize connection to database", err)
+		log.Error("failed to initialize connection to database", "error", err)
 		return err
 	}
 
@@ -46,10 +48,13 @@ func Run(log *slog.Logger) error {
 		log,
 		storage,
 	)
+	
+	newServiceCredentials := credentials.NewService(log, storage)
 
 	// Создаем grpc
 	registerUser := handlerRegister.NewHandlers(log, newServiceAuth)
 	authUser := handlerAuth.NewHandlers(log, newServiceAuth)
+	postCredentials := handlerCredentials.NewHandlers(log, newServiceCredentials)
 
 	// Создаем GRPC-сервер
 	grpcServer := grpc.NewServer()
@@ -57,16 +62,17 @@ func Run(log *slog.Logger) error {
 	// Регистрируем goph-keeper в GRPC-сервере
 	pd.RegisterRegisterServer(grpcServer, registerUser)
 	pd.RegisterAuthServer(grpcServer, authUser)
+	pd.RegisterPostCredentialsServer(grpcServer, postCredentials)
 
 	go func() {
 		listener, err := net.Listen("tcp", flags.AddrGRPC)
 		if err != nil {
-			log.Error("failed to listen", err)
+			log.Error("failed to listen", "error", err)
 			return
 		}
 		log.Info("application run")
 		if err := grpcServer.Serve(listener); err != nil {
-			slog.Error("failed to serve", err)
+			slog.Error("failed to serve", "error", err)
 			return
 		}
 

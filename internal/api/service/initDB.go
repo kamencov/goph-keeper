@@ -13,6 +13,7 @@ type repo interface {
 	CheckPassword(login string) (string, bool)
 	SaveUser(ctx context.Context, login, hashPassword string) error
 	SaveTableUserAndUpdateToken(login, accessToken string) error
+	SaveLoginAndPasswordInCredentials(ctx context.Context, resource string, loginID int, password string) error
 	GetUserID(ctx context.Context, login string) (int, error)
 	Close() error
 }

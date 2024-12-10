@@ -9,6 +9,11 @@ import (
 	"os"
 )
 
+// Кастомные ошибки
+var (
+	ErrUserAlreadyExists = errors.New("the user already exists")
+)
+
 // Postgresql - подключение к базе данных
 type Postgresql struct {
 	storage *sql.DB
@@ -24,17 +29,12 @@ func NewPostgresql(log *slog.Logger) (*Postgresql, error) {
 	return p, err
 }
 
-// Кастомные ошибки
-var (
-	ErrUserAlreadyExists = errors.New("the user already exists")
-)
-
 // initDB - инициализация подключения к базе данных
 func (p *Postgresql) initDB() error {
 	path := os.Getenv("DATABASE_DSN")
 	db, err := sql.Open("pgx", path)
 	if err != nil {
-		slog.Error("failed to connect to database", err)
+		p.log.Error("failed to connect to database", "error", err)
 		return err
 	}
 
@@ -77,7 +77,7 @@ func (p *Postgresql) createTableIfNotExists() (err error) {
     )`
 	_, err = tx.Exec(query)
 	if err != nil {
-		p.log.Error("failed to create table - USERS", "error", err)
+		p.log.Error("failed to create table - users", "error", err)
 		return err
 	}
 
@@ -92,7 +92,20 @@ func (p *Postgresql) createTableIfNotExists() (err error) {
     )`
 	_, err = tx.Exec(query)
 	if err != nil {
-		p.log.Error("failed to create table - NOTES", "error", err)
+		p.log.Error("failed to create table - credentials", "error", err)
+		return err
+	}
+
+	// Создаем таблицу notes
+	query = `CREATE TABLE IF NOT EXISTS text_data (
+        id SERIAL PRIMARY KEY, 
+        user_id INT NOT NULL, 
+        text TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+    )`
+	_, err = tx.Exec(query)
+	if err != nil {
+		p.log.Error("failed to create table - text_data", "error", err)
 		return err
 	}
 
@@ -173,10 +186,10 @@ func (p *Postgresql) SaveTableUserAndUpdateToken(login, accessToken string) erro
 	return nil
 }
 
-func (p *Postgresql) SaveLoginAndPasswordInCredentials(info, login, password string) error {
+func (p *Postgresql) SaveLoginAndPasswordInCredentials(ctx context.Context, resource string, loginID int, password string) error {
 	query := `INSERT INTO credentials (resource, login, password) VALUES ($1, $2, $3)`
 
-	_, err := p.storage.Exec(query, info, login, password)
+	_, err := p.storage.ExecContext(ctx, query, resource, loginID, password)
 	if err != nil {
 		p.log.Error("failed to save in credentials", "error", err)
 		return err
@@ -190,11 +203,11 @@ func (p *Postgresql) GetUserID(ctx context.Context, login string) (int, error) {
 
 	var uid int
 
-	err := p.storage.QueryRow(query, login).Scan(&uid)
+	err := p.storage.QueryRowContext(ctx, query, login).Scan(&uid)
 
 	if err := err; err != nil {
 		p.log.Error("failed to get id", "error", err)
-		return -1, err
+		return -1, sql.ErrNoRows
 	}
 
 	return uid, nil

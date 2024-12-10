@@ -36,4 +36,7 @@ func (m *Memory) SaveUser(ctx context.Context, login, hashPassword string) error
 func (m *Memory) SaveTableUserAndUpdateToken(login, accessToken string) error {
 	return nil
 }
+func (m *Memory) SaveLoginAndPasswordInCredentials(ctx context.Context, resource string, loginID int, password string) error {
+	return nil
+}
 func (m *Memory) GetUserID(ctx context.Context, login string) (int, error) { return -1, nil }

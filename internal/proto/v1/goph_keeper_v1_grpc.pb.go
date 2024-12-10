@@ -223,101 +223,203 @@ var Auth_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	Post_PostLoginAndPassword_FullMethodName = "/goph_keeper_v1.Post/PostLoginAndPassword"
+	PostCredentials_PostLoginAndPassword_FullMethodName = "/goph_keeper_v1.PostCredentials/PostLoginAndPassword"
 )
 
-// PostClient is the client API for Post service.
+// PostCredentialsClient is the client API for PostCredentials service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type PostClient interface {
+type PostCredentialsClient interface {
 	PostLoginAndPassword(ctx context.Context, in *PostLoginAndPasswordRequest, opts ...grpc.CallOption) (*Empty, error)
 }
 
-type postClient struct {
+type postCredentialsClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewPostClient(cc grpc.ClientConnInterface) PostClient {
-	return &postClient{cc}
+func NewPostCredentialsClient(cc grpc.ClientConnInterface) PostCredentialsClient {
+	return &postCredentialsClient{cc}
 }
 
-func (c *postClient) PostLoginAndPassword(ctx context.Context, in *PostLoginAndPasswordRequest, opts ...grpc.CallOption) (*Empty, error) {
+func (c *postCredentialsClient) PostLoginAndPassword(ctx context.Context, in *PostLoginAndPasswordRequest, opts ...grpc.CallOption) (*Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, Post_PostLoginAndPassword_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, PostCredentials_PostLoginAndPassword_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// PostServer is the server API for Post service.
-// All implementations must embed UnimplementedPostServer
+// PostCredentialsServer is the server API for PostCredentials service.
+// All implementations must embed UnimplementedPostCredentialsServer
 // for forward compatibility.
-type PostServer interface {
+type PostCredentialsServer interface {
 	PostLoginAndPassword(context.Context, *PostLoginAndPasswordRequest) (*Empty, error)
-	mustEmbedUnimplementedPostServer()
+	mustEmbedUnimplementedPostCredentialsServer()
 }
 
-// UnimplementedPostServer must be embedded to have
+// UnimplementedPostCredentialsServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedPostServer struct{}
+type UnimplementedPostCredentialsServer struct{}
 
-func (UnimplementedPostServer) PostLoginAndPassword(context.Context, *PostLoginAndPasswordRequest) (*Empty, error) {
+func (UnimplementedPostCredentialsServer) PostLoginAndPassword(context.Context, *PostLoginAndPasswordRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PostLoginAndPassword not implemented")
 }
-func (UnimplementedPostServer) mustEmbedUnimplementedPostServer() {}
-func (UnimplementedPostServer) testEmbeddedByValue()              {}
+func (UnimplementedPostCredentialsServer) mustEmbedUnimplementedPostCredentialsServer() {}
+func (UnimplementedPostCredentialsServer) testEmbeddedByValue()                         {}
 
-// UnsafePostServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to PostServer will
+// UnsafePostCredentialsServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to PostCredentialsServer will
 // result in compilation errors.
-type UnsafePostServer interface {
-	mustEmbedUnimplementedPostServer()
+type UnsafePostCredentialsServer interface {
+	mustEmbedUnimplementedPostCredentialsServer()
 }
 
-func RegisterPostServer(s grpc.ServiceRegistrar, srv PostServer) {
-	// If the following call pancis, it indicates UnimplementedPostServer was
+func RegisterPostCredentialsServer(s grpc.ServiceRegistrar, srv PostCredentialsServer) {
+	// If the following call pancis, it indicates UnimplementedPostCredentialsServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&Post_ServiceDesc, srv)
+	s.RegisterService(&PostCredentials_ServiceDesc, srv)
 }
 
-func _Post_PostLoginAndPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PostCredentials_PostLoginAndPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PostLoginAndPasswordRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PostServer).PostLoginAndPassword(ctx, in)
+		return srv.(PostCredentialsServer).PostLoginAndPassword(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Post_PostLoginAndPassword_FullMethodName,
+		FullMethod: PostCredentials_PostLoginAndPassword_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PostServer).PostLoginAndPassword(ctx, req.(*PostLoginAndPasswordRequest))
+		return srv.(PostCredentialsServer).PostLoginAndPassword(ctx, req.(*PostLoginAndPasswordRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// Post_ServiceDesc is the grpc.ServiceDesc for Post service.
+// PostCredentials_ServiceDesc is the grpc.ServiceDesc for PostCredentials service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var Post_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "goph_keeper_v1.Post",
-	HandlerType: (*PostServer)(nil),
+var PostCredentials_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "goph_keeper_v1.PostCredentials",
+	HandlerType: (*PostCredentialsServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "PostLoginAndPassword",
-			Handler:    _Post_PostLoginAndPassword_Handler,
+			Handler:    _PostCredentials_PostLoginAndPassword_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "internal/proto/v1/goph_keeper_v1.proto",
+}
+
+const (
+	PostTextData_PostTextData_FullMethodName = "/goph_keeper_v1.PostTextData/PostTextData"
+)
+
+// PostTextDataClient is the client API for PostTextData service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type PostTextDataClient interface {
+	PostTextData(ctx context.Context, in *PostTextDataRequest, opts ...grpc.CallOption) (*Empty, error)
+}
+
+type postTextDataClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewPostTextDataClient(cc grpc.ClientConnInterface) PostTextDataClient {
+	return &postTextDataClient{cc}
+}
+
+func (c *postTextDataClient) PostTextData(ctx context.Context, in *PostTextDataRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, PostTextData_PostTextData_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// PostTextDataServer is the server API for PostTextData service.
+// All implementations must embed UnimplementedPostTextDataServer
+// for forward compatibility.
+type PostTextDataServer interface {
+	PostTextData(context.Context, *PostTextDataRequest) (*Empty, error)
+	mustEmbedUnimplementedPostTextDataServer()
+}
+
+// UnimplementedPostTextDataServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedPostTextDataServer struct{}
+
+func (UnimplementedPostTextDataServer) PostTextData(context.Context, *PostTextDataRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PostTextData not implemented")
+}
+func (UnimplementedPostTextDataServer) mustEmbedUnimplementedPostTextDataServer() {}
+func (UnimplementedPostTextDataServer) testEmbeddedByValue()                      {}
+
+// UnsafePostTextDataServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to PostTextDataServer will
+// result in compilation errors.
+type UnsafePostTextDataServer interface {
+	mustEmbedUnimplementedPostTextDataServer()
+}
+
+func RegisterPostTextDataServer(s grpc.ServiceRegistrar, srv PostTextDataServer) {
+	// If the following call pancis, it indicates UnimplementedPostTextDataServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&PostTextData_ServiceDesc, srv)
+}
+
+func _PostTextData_PostTextData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PostTextDataRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostTextDataServer).PostTextData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PostTextData_PostTextData_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostTextDataServer).PostTextData(ctx, req.(*PostTextDataRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// PostTextData_ServiceDesc is the grpc.ServiceDesc for PostTextData service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var PostTextData_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "goph_keeper_v1.PostTextData",
+	HandlerType: (*PostTextDataServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "PostTextData",
+			Handler:    _PostTextData_PostTextData_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -1,9 +1,13 @@
 package credentials
 
-import "log/slog"
+import (
+	"context"
+	"log/slog"
+)
 
 type credentials interface {
-	SaveLoginAndPasswordInCredentials(info, login, password string) error
+	SaveLoginAndPasswordInCredentials(ctx context.Context, resource string, loginID int, password string) error
+	GetUserID(ctx context.Context, login string) (int, error)
 }
 
 type Service struct {

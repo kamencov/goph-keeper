@@ -2,18 +2,20 @@ package credentials
 
 import (
 	"context"
+	"errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	pd "goph-keeper/internal/proto/v1"
+	"goph-keeper/internal/services/credentials"
 	"log/slog"
 )
 
 type serviceCredentials interface {
-	SaveLoginAndPassword(info, login, password string) error
+	SaveLoginAndPassword(ctx context.Context, info, login, password string) error
 }
 
 type Handlers struct {
-	pd.UnimplementedPostServer
+	pd.UnimplementedPostCredentialsServer
 	log     *slog.Logger
 	service serviceCredentials
 }
@@ -33,10 +35,14 @@ func (h *Handlers) PostLoginAndPassword(ctx context.Context, in *pd.PostLoginAnd
 		return nil, status.Errorf(codes.InvalidArgument, "password or login is empty")
 	}
 
-	err := h.service.SaveLoginAndPassword(in.Resource, in.Login, in.Password)
+	err := h.service.SaveLoginAndPassword(ctx, in.GetResource(), in.GetLogin(), in.GetPassword())
 
 	if err != nil {
-		h.log.Error("failed to save login and password", err)
+		if errors.Is(err, credentials.ErrNotFoundUser) {
+			h.log.Error("failed to get login in base", "error", err)
+			return nil, status.Errorf(codes.NotFound, "login is not correct")
+		}
+		h.log.Error("failed to save login and password", "error", err)
 		return nil, status.Errorf(codes.Internal, "failed to save login and password")
 	}
 
