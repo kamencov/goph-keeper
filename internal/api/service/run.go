@@ -10,11 +10,12 @@ import (
 	handlerRegister "goph-keeper/internal/grpc/register"
 	handlerTextData "goph-keeper/internal/grpc/text_data"
 	pd "goph-keeper/internal/proto/v1"
-	serviceAuth "goph-keeper/internal/services/auth"
-	binaryData "goph-keeper/internal/services/binary_data"
-	"goph-keeper/internal/services/cards"
-	"goph-keeper/internal/services/credentials"
-	textData "goph-keeper/internal/services/text_data"
+	serviceAuth "goph-keeper/internal/services/server/auth"
+	binaryData "goph-keeper/internal/services/server/binary_data"
+	"goph-keeper/internal/services/server/cards"
+	"goph-keeper/internal/services/server/credentials"
+	textData "goph-keeper/internal/services/server/text_data"
+	"goph-keeper/internal/storage/postgresql"
 	"log/slog"
 	"net"
 	"os"
@@ -32,19 +33,19 @@ func Run(log *slog.Logger) error {
 	flags := NewFlags(log)
 	flags.Parse()
 
-	// Подключаемся к базе данных
-	storage, err := initDB(log, flags)
+	// Инициализация подключения к базе данных
+	db, err := postgresql.NewPostgresql(log)
 	if err != nil {
 		log.Error("failed to initialize connection to database", "error", err)
 		return err
 	}
 
-	defer func(storage repo) {
-		err := storage.Close()
+	defer func(db *postgresql.Postgresql) {
+		err := db.Close()
 		if err != nil {
 
 		}
-	}(storage)
+	}(db)
 
 	// Создаем сервисы
 	newServiceAuth := serviceAuth.NewServiceAuth(
@@ -52,12 +53,12 @@ func Run(log *slog.Logger) error {
 		flags.PasswordSalt,
 		24*time.Hour,
 		log,
-		storage,
+		db,
 	)
-	newServiceCredentials := credentials.NewService(log, storage)
-	newServiceTextData := textData.NewService(log, storage)
-	newServiceBinaryData := binaryData.NewService(log, storage)
-	newServiceCards := cards.NewServiceCards(log, storage)
+	newServiceCredentials := credentials.NewService(log, db)
+	newServiceTextData := textData.NewService(log, db)
+	newServiceBinaryData := binaryData.NewService(log, db)
+	newServiceCards := cards.NewServiceCards(log, db)
 
 	// Создаем grpc
 	registerUser := handlerRegister.NewHandlers(log, newServiceAuth)
@@ -80,6 +81,7 @@ func Run(log *slog.Logger) error {
 
 	go func() {
 		listener, err := net.Listen("tcp", flags.AddrGRPC)
+		log.Info("application start", "addr:", flags.AddrGRPC)
 		if err != nil {
 			log.Error("failed to listen", "error", err)
 			return

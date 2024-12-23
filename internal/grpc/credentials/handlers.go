@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc/status"
 	"goph-keeper/internal/middleware"
 	pd "goph-keeper/internal/proto/v1"
-	"goph-keeper/internal/services/credentials"
+	"goph-keeper/internal/services/server/credentials"
 	"log/slog"
 )
 

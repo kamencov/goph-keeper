@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/pressly/goose/v3"
 	"log/slog"
 	"os"
 )
@@ -40,106 +41,21 @@ func (p *Postgresql) initDB() error {
 	p.storage = db
 	p.log.Info("connected to database")
 
-	err = p.createTableIfNotExists()
+	err = p.applyMigrations()
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-// createTableIfNotExists - создает таблицы в базе данных, если они не существуют.
-func (p *Postgresql) createTableIfNotExists() (err error) {
-	// Открытие транзакции
-	tx, err := p.storage.Begin()
-	if err != nil {
-		p.log.Error("failed to begin transaction", "error", err)
+// applyMigrations - выполняет миграции через Goose
+func (p *Postgresql) applyMigrations() error {
+	migrationsDir := "./internal/migrations"
+	if err := goose.Up(p.storage, migrationsDir); err != nil {
+		p.log.Error("failed to apply migrations", "error", err)
 		return err
 	}
-
-	defer func() {
-		if p := recover(); p != nil {
-			_ = tx.Rollback()
-			panic(p)
-		}
-		if err != nil {
-			_ = tx.Rollback() // Rollback, если Commit не был вызван
-		}
-
-	}()
-
-	// Создаем таблицу users
-	query := `CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY, 
-        login VARCHAR(255) NOT NULL, 
-        password VARCHAR(255) NOT NULL, 
-        token TEXT
-    )`
-	_, err = tx.Exec(query)
-	if err != nil {
-		p.log.Error("failed to create table - users", "error", err)
-		return err
-	}
-
-	// Создаем таблицу credentials
-	query = `CREATE TABLE IF NOT EXISTS credentials (
-        id SERIAL PRIMARY KEY, 
-        user_id INT NOT NULL, 
-        resource VARCHAR(255) NOT NULL,
-    	login VARCHAR(255) NOT NULL,
-    	password VARCHAR(255) NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-    )`
-	_, err = tx.Exec(query)
-	if err != nil {
-		p.log.Error("failed to create table - credentials", "error", err)
-		return err
-	}
-
-	// Создаем таблицу text_data
-	query = `CREATE TABLE IF NOT EXISTS text_data (
-        id SERIAL PRIMARY KEY, 
-        user_id INT NOT NULL, 
-        text TEXT NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-    )`
-	_, err = tx.Exec(query)
-	if err != nil {
-		p.log.Error("failed to create table - text_data", "error", err)
-		return err
-	}
-
-	// Создаем таблицу binary_data
-	query = `CREATE TABLE IF NOT EXISTS binary_data (
-        id SERIAL PRIMARY KEY, 
-        user_id INT NOT NULL, 
-        binary BYTEA NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-    )`
-	_, err = tx.Exec(query)
-	if err != nil {
-		p.log.Error("failed to create table - binary_data", "error", err)
-		return err
-	}
-
-	// Создаем таблицу cards
-	query = `CREATE TABLE IF NOT EXISTS cards (
-        id SERIAL PRIMARY KEY, 
-        user_id INT NOT NULL, 
-        cards TEXT NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-    )`
-	_, err = tx.Exec(query)
-	if err != nil {
-		p.log.Error("failed to create table - cards", "error", err)
-		return err
-	}
-
-	// Подтверждаем транзакцию
-	if err = tx.Commit(); err != nil {
-		p.log.Error("failed to commit transaction", "error", err)
-		return err
-	}
-
+	p.log.Info("migrations applied successfully")
 	return nil
 }
 

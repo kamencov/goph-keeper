@@ -6,7 +6,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	pd "goph-keeper/internal/proto/v1"
-	"goph-keeper/internal/services/auth"
+	"goph-keeper/internal/services/server/auth"
 	"log/slog"
 )
 

@@ -1,0 +1,4 @@
+time=2024-12-23T20:22:39.939+03:00 level=INFO msg="connected to database"
+time=2024-12-23T20:22:40.735+03:00 level=INFO msg="Switching to AuthUser page"
+time=2024-12-23T20:22:45.123+03:00 level=INFO msg="access token updated"
+time=2024-12-23T20:22:48.902+03:00 level=INFO msg="start credentials"
