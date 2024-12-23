@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"database/sql"
 	"github.com/rivo/tview"
 	"google.golang.org/grpc"
 	"goph-keeper/internal/api/client/handlers/auth"
@@ -9,20 +10,26 @@ import (
 	"log/slog"
 )
 
-type CLI struct {
-	log   *slog.Logger
-	auth  *auth.Handlers
-	save  *save.Handler
-	conn  *grpc.ClientConn
-	token string
+type getService interface {
+	GetAllData(ctx context.Context, token, tableName string) (*sql.Rows, error)
 }
 
-func NewCLI(log *slog.Logger, auth *auth.Handlers, save *save.Handler, conn *grpc.ClientConn) *CLI {
+type CLI struct {
+	log    *slog.Logger
+	auth   *auth.Handlers
+	save   *save.Handler
+	getAll getService
+	conn   *grpc.ClientConn
+	token  string
+}
+
+func NewCLI(log *slog.Logger, auth *auth.Handlers, save *save.Handler, get getService, conn *grpc.ClientConn) *CLI {
 	return &CLI{
-		log:  log,
-		auth: auth,
-		save: save,
-		conn: conn,
+		log:    log,
+		auth:   auth,
+		save:   save,
+		getAll: get,
+		conn:   conn,
 	}
 }
 

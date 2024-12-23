@@ -35,6 +35,10 @@ func (c *CLI) buttonsStart(ctx context.Context, app *tview.Application, pages *t
 func (c *CLI) buttonsData(ctx context.Context, app *tview.Application, pages *tview.Pages) *tview.Form {
 	form := tview.NewForm()
 	form.
+		AddButton("Find all data", func() {
+			// открывает перечень всего сохраненного
+			c.getResource(ctx, app, pages)
+		}).
 		AddButton("Credentials", func() {
 			pages.AddPage("Credentials", c.credentials(ctx, app, pages), true, false)
 			pages.SwitchToPage("Credentials")
@@ -58,10 +62,11 @@ func (c *CLI) buttonsData(ctx context.Context, app *tview.Application, pages *tv
 		SetTitleAlign(tview.AlignCenter)
 
 	form.AddFormItem(tview.NewTextView().SetText("Выберите действие:\n" +
-		"1. Credentials: Если вы хотите сохранить данные\n" +
-		"2. Text: Если вы хотите сохранить текст\n" +
-		"3. Binary: Если вы хотите сохранить бинарные данные\n" +
-		"4. Card: Если вы хотите сохранить данные карты\n"))
+		"1. Find all data: Если вы хотите посмотреть все сохраненные данные\n" +
+		"2. Credentials: Если вы хотите сохранить данные\n" +
+		"3. Text: Если вы хотите сохранить текст\n" +
+		"4. Binary: Если вы хотите сохранить бинарные данные\n" +
+		"5. Card: Если вы хотите сохранить данные карты\n"))
 
 	return form
 }

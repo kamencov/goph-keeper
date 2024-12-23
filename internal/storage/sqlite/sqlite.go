@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
-	"goph-keeper/internal/api/client/cli"
 	"log/slog"
 	"os"
 	"time"
@@ -249,43 +248,6 @@ func (s *Storage) SaveLoginAndPasswordInCredentials(
 	return nil
 }
 
-// GetLoginAndPasswordInCredentials получает все сохраненные данные в виде []cli.Resource и если нет ничего, то вернет ошибку.
-func (s *Storage) GetLoginAndPasswordInCredentials(ctx context.Context, userID int) (*[]cli.Resource, error) {
-	var result []cli.Resource
-	query := `SELECT resource, login, password FROM credentials WHERE user_id = $1`
-
-	rows, err := s.storage.QueryContext(ctx, query, userID)
-	if err != nil {
-		s.log.Error("failed to GetLoginAndPasswordInCredentials", "error", err)
-		return nil, err
-	}
-
-	defer func(rows *sql.Rows) {
-		err := rows.Close()
-		if err != nil {
-
-		}
-	}(rows)
-
-	for rows.Next() {
-		var row cli.Resource
-
-		if err := rows.Scan(&row.Resource, &row.Login, &row.Password); err != nil {
-			s.log.Error("failed to scan rows", "error", err)
-			return nil, err
-		}
-
-		result = append(result, row)
-	}
-
-	if len(result) == 0 {
-		s.log.Error("failed, len Resource = 0")
-		return nil, sql.ErrNoRows
-	}
-
-	return &result, nil
-}
-
 // SaveTextData - сохраняет получены текст в базу.
 func (s *Storage) SaveTextDataInDatabase(ctx context.Context, data string) error {
 	query := `INSERT INTO text_data (data) VALUES ($1)`
@@ -325,37 +287,14 @@ func (s *Storage) SaveCardsInDatabase(ctx context.Context, cards string) error {
 	return nil
 }
 
-//// GetUserIDByToken - получает user_id по токену.
-//func (s *Storage) GetUserIDByToken(ctx context.Context, token string) (int, error) {
-//	query := "SELECT id FROM users WHERE token = $1"
-//
-//	var userID int
-//	err := s.storage.QueryRowContext(ctx, query, token).Scan(&userID)
-//	if err != nil {
-//		if errors.Is(err, sql.ErrNoRows) {
-//			// Пользователь не найден, это не ошибка
-//			return -1, nil
-//		}
-//		// Логируем ошибку при выполнении запроса
-//		s.log.Error("failed to check user", "error", err)
-//		return -1, err
-//	}
-//
-//	return userID, nil
-//}
-//
-//// GetUserIDByLogin - получает user_id по логину.
-//func (s *Storage) GetUserIDByLogin(ctx context.Context, login string) (int, error) {
-//	query := `SELECT id FROM users WHERE login = $1`
-//
-//	var uid int
-//
-//	err := s.storage.QueryRowContext(ctx, query, login).Scan(&uid)
-//
-//	if err := err; err != nil {
-//		s.log.Error("failed to get id", "error", err)
-//		return -1, sql.ErrNoRows
-//	}
-//
-//	return uid, nil
-//}
+// GetAll - возвращает все данные из базы данных.
+func (s *Storage) GetAll(ctx context.Context, tableName string) (*sql.Rows, error) {
+	query := fmt.Sprintf("SELECT * FROM %s", tableName)
+	rows, err := s.storage.QueryContext(ctx, query)
+	if err != nil {
+		s.log.Error("failed to get all data from database", "error", err)
+		return nil, err
+	}
+
+	return rows, nil
+}
