@@ -6,7 +6,8 @@ import (
 )
 
 type storageClient interface {
-	SaveCardsInDatabase(ctx context.Context, card string) error
+	SaveCardsInDatabase(ctx context.Context, userID int, card string) error
+	GetUserIDWithToken(ctx context.Context, token string) (int, error)
 }
 
 type ServiceClient struct {

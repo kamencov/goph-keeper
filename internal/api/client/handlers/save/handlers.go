@@ -14,13 +14,13 @@ type serviceCredentials interface {
 	SaveLoginAndPassword(ctx context.Context, token, resource, login, password string) error
 }
 type serviceTextData interface {
-	SaveTextData(ctx context.Context, data string) error
+	SaveTextData(ctx context.Context, token, data string) error
 }
 type serviceBinaryData interface {
-	SaveBinaryData(ctx context.Context, data string) error
+	SaveBinaryData(ctx context.Context, token, data string) error
 }
 type serviceCards interface {
-	SaveCards(ctx context.Context, data string) error
+	SaveCards(ctx context.Context, token, data string) error
 }
 
 type Handler struct {
@@ -60,14 +60,14 @@ func (h *Handler) PostLoginAndPassword(ctx context.Context, token, resource, log
 	return nil
 }
 
-func (h *Handler) PostTextData(ctx context.Context, data string) error {
+func (h *Handler) PostTextData(ctx context.Context, token, data string) error {
 
 	if data == "" {
 		fmt.Println("data is empty")
 		return ErrNotEmpty
 	}
 
-	err := h.serviceTextData.SaveTextData(ctx, data)
+	err := h.serviceTextData.SaveTextData(ctx, token, data)
 	if err != nil {
 		return err
 	}
@@ -75,14 +75,14 @@ func (h *Handler) PostTextData(ctx context.Context, data string) error {
 	return nil
 }
 
-func (h *Handler) PostBinaryData(ctx context.Context, data string) error {
+func (h *Handler) PostBinaryData(ctx context.Context, token, data string) error {
 
 	if data == "" {
 		fmt.Println("data is empty")
 		return ErrNotEmpty
 	}
 
-	err := h.serviceBinaryData.SaveBinaryData(ctx, data)
+	err := h.serviceBinaryData.SaveBinaryData(ctx, token, data)
 	if err != nil {
 		return err
 	}
@@ -90,14 +90,14 @@ func (h *Handler) PostBinaryData(ctx context.Context, data string) error {
 	return nil
 }
 
-func (h *Handler) PostCards(ctx context.Context, data string) error {
+func (h *Handler) PostCards(ctx context.Context, token, data string) error {
 
 	if data == "" {
 		fmt.Println("data is empty")
 		return ErrNotEmpty
 	}
 
-	err := h.serviceCards.SaveCards(ctx, data)
+	err := h.serviceCards.SaveCards(ctx, token, data)
 	if err != nil {
 		return err
 	}

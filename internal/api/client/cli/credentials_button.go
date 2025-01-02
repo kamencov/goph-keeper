@@ -35,6 +35,9 @@ func (c *CLI) credentials(ctx context.Context, app *tview.Application, pages *tv
 			// Открываем модальное окно подтверждения
 			c.saveResource(ctx, app, pages, form, &resource)
 		}).
+		AddButton("Back", func() {
+			pages.SwitchToPage("Buttons_data")
+		}).
 		AddButton("Quit", func() {
 			app.Stop()
 		})
@@ -66,7 +69,7 @@ func (c *CLI) saveResource(
 				err := c.save.PostLoginAndPassword(ctx, c.token, resource.Resource, resource.Login, resource.Password)
 				if err != nil {
 					c.log.Error("failed save credentials", "error", err)
-					c.errorsSave(ctx, app, pages)
+					c.errorsSaveCredentials(ctx, app, pages)
 				} else {
 					pages.SwitchToPage("Buttons_data")
 				}

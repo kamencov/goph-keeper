@@ -2,8 +2,6 @@ package auth_client
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"log/slog"
 )
 
@@ -29,15 +27,11 @@ func (s *Service) SaveTokenInBase(ctx context.Context, login, token string) erro
 	// получаем user_id с помощью login
 	userID, err := s.db.GetUserIDWithLogin(ctx, login)
 	if err != nil {
-		if !errors.Is(err, sql.ErrNoRows) {
-			err = s.db.SaveLoginAndToken(ctx, login, token)
-			if err != nil {
-				return err
-			}
-			return nil
+		err = s.db.SaveLoginAndToken(ctx, login, token)
+		if err != nil {
+			return err
 		}
-		s.log.Error("failed to check user id", "error:", err)
-		return err
+		return nil
 	}
 	err = s.db.UpdateLoginAndToken(ctx, userID, token)
 	if err != nil {

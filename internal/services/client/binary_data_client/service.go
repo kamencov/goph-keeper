@@ -6,7 +6,8 @@ import (
 )
 
 type storageClient interface {
-	SaveBinaryDataInDatabase(ctx context.Context, data string) error
+	SaveBinaryDataInDatabase(ctx context.Context, userID int, data string) error
+	GetUserIDWithToken(ctx context.Context, token string) (int, error)
 }
 
 type ServiceClient struct {

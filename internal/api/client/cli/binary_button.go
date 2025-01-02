@@ -18,7 +18,10 @@ func (c *CLI) binaryButton(ctx context.Context, app *tview.Application, pages *t
 		}).
 		AddButton("Save", func() {
 			// Показываем подтверждение сохранения
-			c.saveBinaryData(pages, form, &binaryData)
+			c.saveBinaryData(ctx, app, pages, form, &binaryData)
+		}).
+		AddButton("Back", func() {
+			pages.SwitchToPage("Buttons_data")
 		}).
 		AddButton("Quit", func() {
 			app.Stop()
@@ -27,16 +30,20 @@ func (c *CLI) binaryButton(ctx context.Context, app *tview.Application, pages *t
 
 }
 
-func (c *CLI) saveBinaryData(pages *tview.Pages, form *tview.Form, binaryData *BinaryDataCLI) {
+func (c *CLI) saveBinaryData(ctx context.Context, app *tview.Application, pages *tview.Pages, form *tview.Form, binaryData *BinaryDataCLI) {
 	model := tview.NewModal()
 	model.SetText("Вы хотите сохранить данные?\n" +
 		"Binary: " + binaryData.Data)
 	model.AddButtons([]string{"Save", "Correct", "Cancel"})
 	model.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 		if buttonLabel == "Save" {
-			// Возврат в главное меню после сохранения
-			clearFormBinary(form, binaryData)
-			pages.SwitchToPage("Buttons_data")
+			err := c.save.PostBinaryData(ctx, c.token, binaryData.Data)
+			if err != nil {
+				c.log.Error("failed save credentials", "error", err)
+				c.errorsSaveBinary(ctx, app, pages)
+			} else {
+				pages.SwitchToPage("Buttons_data")
+			}
 		} else if buttonLabel == "Correct" {
 			pages.SwitchToPage("Binary")
 		} else {

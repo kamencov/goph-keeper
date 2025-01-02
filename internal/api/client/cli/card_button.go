@@ -13,20 +13,22 @@ func (c *CLI) cardButton(ctx context.Context, app *tview.Application, pages *tvi
 	var cardData CardData
 	form := tview.NewForm()
 	form.
-		AddInputField("Card", "", 20, nil, func(text string) {
-			cardData.Data = text
+		AddInputField("Card [only numbers]", "", 20, func(textToCheck string, lastChar rune) bool {
+			// Проверяем, что каждый вводимый символ является цифрой
+			return lastChar >= '0' && lastChar <= '9'
+		}, func(text string) {
+			// Проверяем текст полностью после завершения ввода
+			if len(text) == 16 {
+				cardData.Data = text
+				c.log.Info("Card number saved", "card", cardData.Data)
+			}
 		}).
 		AddButton("Save", func() {
 			// Показываем подтверждение сохранения
-			c.saveCardData(pages, form, &cardData)
+			c.saveCardData(ctx, app, pages, form, &cardData)
 		}).
-		AddButton("Find", func() {
-			// Показываем подтверждение сохранения
-			//c.findCardData(pages, form, &cardData)
-		}).
-		AddButton("Delete", func() {
-			// Показываем подтверждение сохранения
-			//c.deleteCardData(pages, form, &cardData)
+		AddButton("Back", func() {
+			pages.SwitchToPage("Buttons_data")
 		}).
 		AddButton("Quit", func() {
 			app.Stop()
@@ -34,16 +36,20 @@ func (c *CLI) cardButton(ctx context.Context, app *tview.Application, pages *tvi
 	return form
 }
 
-func (c *CLI) saveCardData(pages *tview.Pages, form *tview.Form, cardData *CardData) {
+func (c *CLI) saveCardData(ctx context.Context, app *tview.Application, pages *tview.Pages, form *tview.Form, cardData *CardData) {
 	model := tview.NewModal()
 	model.SetText("Вы хотите сохранить данные?\n" +
 		"Card: " + cardData.Data)
 	model.AddButtons([]string{"Save", "Correct", "Cancel"})
 	model.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 		if buttonLabel == "Save" {
-			// Возврат в главное меню после сохранения
-			clearFormCard(form, cardData)
-			pages.SwitchToPage("Buttons_data")
+			err := c.save.PostCards(ctx, c.token, cardData.Data)
+			if err != nil {
+				c.log.Error("failed save credentials", "error", err)
+				c.errorsSaveCards(ctx, app, pages)
+			} else {
+				pages.SwitchToPage("Buttons_data")
+			}
 		} else if buttonLabel == "Correct" {
 			pages.SwitchToPage("Card")
 		} else {

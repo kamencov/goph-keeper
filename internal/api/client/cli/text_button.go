@@ -18,7 +18,10 @@ func (c *CLI) textButton(ctx context.Context, app *tview.Application, pages *tvi
 	}).
 		AddButton("Save", func() {
 			// Показываем подтверждение сохранения
-			c.saveTextData(pages, form, &textData)
+			c.saveTextData(ctx, app, pages, form, &textData)
+		}).
+		AddButton("Back", func() {
+			pages.SwitchToPage("Buttons_data")
 		}).
 		AddButton("Quit", func() {
 			app.Stop()
@@ -27,7 +30,7 @@ func (c *CLI) textButton(ctx context.Context, app *tview.Application, pages *tvi
 }
 
 // Модальное окно подтверждения сохранения
-func (c *CLI) saveTextData(pages *tview.Pages, form *tview.Form, textData *TextData) {
+func (c *CLI) saveTextData(ctx context.Context, app *tview.Application, pages *tview.Pages, form *tview.Form, textData *TextData) {
 	modal := tview.NewModal().
 		SetText("Вы хотите сохранить данные?\n" +
 			"Text: " + textData.Text).
@@ -35,8 +38,13 @@ func (c *CLI) saveTextData(pages *tview.Pages, form *tview.Form, textData *TextD
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if buttonLabel == "Save" {
 				// Возврат в главное меню после сохранения
-				clearFormTextData(form, textData)
-				pages.SwitchToPage("Buttons_data")
+				err := c.save.PostTextData(ctx, c.token, textData.Text)
+				if err != nil {
+					c.log.Error("failed save credentials", "error", err)
+					c.errorsSaveText(ctx, app, pages)
+				} else {
+					pages.SwitchToPage("Text")
+				}
 			} else if buttonLabel == "Correct" {
 				pages.SwitchToPage("Text")
 			} else {

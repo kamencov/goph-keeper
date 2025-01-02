@@ -1,4 +1,4 @@
-time=2024-12-23T22:55:12.728+03:00 level=INFO msg="connected to database"
-time=2024-12-23T22:55:16.586+03:00 level=INFO msg="Switching to AuthUser page"
-time=2024-12-23T22:55:20.990+03:00 level=INFO msg="access token updated"
-time=2024-12-23T22:55:36.672+03:00 level=INFO msg="start credentials"
+time=2025-01-02T14:23:23.321+03:00 level=INFO msg="connected to database"
+time=2025-01-02T14:23:26.941+03:00 level=INFO msg="Switching to AuthUser page"
+time=2025-01-02T14:23:36.100+03:00 level=INFO msg="access token updated"
+time=2025-01-02T14:23:53.258+03:00 level=INFO msg="start credentials"

@@ -46,7 +46,7 @@ func (c *CLI) errorsAuth(ctx context.Context, app *tview.Application, pages *tvi
 	pages.AddPage("ErrorsAuth", model, true, true)
 }
 
-func (c *CLI) errorsSave(ctx context.Context, app *tview.Application, pages *tview.Pages) {
+func (c *CLI) errorsSaveCredentials(ctx context.Context, app *tview.Application, pages *tview.Pages) {
 	model := tview.NewModal()
 	model.SetText("Что-то пошло не так\n" +
 		"Выберите действие:\n" +
@@ -63,5 +63,65 @@ func (c *CLI) errorsSave(ctx context.Context, app *tview.Application, pages *tvi
 		})
 
 	// Добавляем модальное окно как новую страницу
-	pages.AddPage("ErrorsSave", model, true, true)
+	pages.AddPage("ErrorsSaveCredentials", model, true, true)
+}
+
+func (c *CLI) errorsSaveCards(ctx context.Context, app *tview.Application, pages *tview.Pages) {
+	model := tview.NewModal()
+	model.SetText("Что-то пошло не так\n" +
+		"Выберите действие:\n" +
+		"1. Save: Повторно сохранить данные\n" +
+		"2. Cancel: Закрыть приложение\n").
+		AddButtons([]string{"Save", "Cancel"}).
+		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+			if buttonLabel == "Save" {
+				pages.AddPage("Card", c.cardButton(ctx, app, pages), true, false)
+				pages.SwitchToPage("Card")
+			} else {
+				app.Stop()
+			}
+		})
+
+	// Добавляем модальное окно как новую страницу
+	pages.AddPage("ErrorsSaveCards", model, true, true)
+}
+
+func (c *CLI) errorsSaveBinary(ctx context.Context, app *tview.Application, pages *tview.Pages) {
+	model := tview.NewModal()
+	model.SetText("Что-то пошло не так\n" +
+		"Выберите действие:\n" +
+		"1. Save: Повторно сохранить данные\n" +
+		"2. Cancel: Закрыть приложение\n").
+		AddButtons([]string{"Save", "Cancel"}).
+		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+			if buttonLabel == "Save" {
+				pages.AddPage("Binary", c.binaryButton(ctx, app, pages), true, false)
+				pages.SwitchToPage("Binary")
+			} else {
+				app.Stop()
+			}
+		})
+
+	// Добавляем модальное окно как новую страницу
+	pages.AddPage("ErrorsSaveBinary", model, true, true)
+}
+
+func (c *CLI) errorsSaveText(ctx context.Context, app *tview.Application, pages *tview.Pages) {
+	model := tview.NewModal()
+	model.SetText("Что-то пошло не так\n" +
+		"Выберите действие:\n" +
+		"1. Save: Повторно сохранить данные\n" +
+		"2. Cancel: Закрыть приложение\n").
+		AddButtons([]string{"Save", "Cancel"}).
+		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+			if buttonLabel == "Save" {
+				pages.AddPage("Text", c.textButton(ctx, app, pages), true, false)
+				pages.SwitchToPage("Text")
+			} else {
+				app.Stop()
+			}
+		})
+
+	// Добавляем модальное окно как новую страницу
+	pages.AddPage("ErrorsSaveText", model, true, true)
 }

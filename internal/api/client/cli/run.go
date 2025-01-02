@@ -14,22 +14,28 @@ type getService interface {
 	GetAllData(ctx context.Context, token, tableName string) (*sql.Rows, error)
 }
 
-type CLI struct {
-	log    *slog.Logger
-	auth   *auth.Handlers
-	save   *save.Handler
-	getAll getService
-	conn   *grpc.ClientConn
-	token  string
+type deletedService interface {
+	DeletedData(ctx context.Context, tableName string, id int) error
 }
 
-func NewCLI(log *slog.Logger, auth *auth.Handlers, save *save.Handler, get getService, conn *grpc.ClientConn) *CLI {
+type CLI struct {
+	log     *slog.Logger
+	auth    *auth.Handlers
+	save    *save.Handler
+	deleted deletedService
+	getAll  getService
+	conn    *grpc.ClientConn
+	token   string
+}
+
+func NewCLI(log *slog.Logger, auth *auth.Handlers, save *save.Handler, deleted deletedService, get getService, conn *grpc.ClientConn) *CLI {
 	return &CLI{
-		log:    log,
-		auth:   auth,
-		save:   save,
-		getAll: get,
-		conn:   conn,
+		log:     log,
+		auth:    auth,
+		save:    save,
+		deleted: deleted,
+		getAll:  get,
+		conn:    conn,
 	}
 }
 

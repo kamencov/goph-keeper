@@ -205,7 +205,7 @@ func (s *Storage) GetUserIDWithToken(ctx context.Context, token string) (int, er
 // SaveLoginAndToken - сохраняет логин и токен в базе данных.
 func (s *Storage) SaveLoginAndToken(ctx context.Context, login, token string) error {
 
-	query := `INSERT INTO users (login, token) VALUE ($1, $2)`
+	query := `INSERT INTO users (login, token) VALUES ($1, $2)`
 	_, err := s.storage.ExecContext(ctx, query, login, token)
 	if err != nil {
 		s.log.Error("failed to update access token", "error", err)
@@ -249,10 +249,10 @@ func (s *Storage) SaveLoginAndPasswordInCredentials(
 }
 
 // SaveTextData - сохраняет получены текст в базу.
-func (s *Storage) SaveTextDataInDatabase(ctx context.Context, data string) error {
-	query := `INSERT INTO text_data (data) VALUES ($1)`
+func (s *Storage) SaveTextDataInDatabase(ctx context.Context, userID int, data string) error {
+	query := `INSERT INTO text_data (user_id, text) VALUES ($1, $2)`
 
-	_, err := s.storage.ExecContext(ctx, query, data)
+	_, err := s.storage.ExecContext(ctx, query, userID, data)
 	if err != nil {
 		s.log.Error("failed to save in credentials", "error", err)
 		return err
@@ -262,10 +262,10 @@ func (s *Storage) SaveTextDataInDatabase(ctx context.Context, data string) error
 }
 
 // SaveBinaryData - сохраняет полученные бинарные данные.
-func (s *Storage) SaveBinaryDataInDatabase(ctx context.Context, data string) error {
-	query := `INSERT INTO binary_data (data) VALUES ($1)`
+func (s *Storage) SaveBinaryDataInDatabase(ctx context.Context, userID int, data string) error {
+	query := `INSERT INTO binary_data (user_id, binary_data) VALUES ($1, $2)`
 
-	_, err := s.storage.ExecContext(ctx, query, data)
+	_, err := s.storage.ExecContext(ctx, query, userID, data)
 	if err != nil {
 		s.log.Error("failed to save in credentials", "error", err)
 		return err
@@ -275,10 +275,10 @@ func (s *Storage) SaveBinaryDataInDatabase(ctx context.Context, data string) err
 }
 
 // SaveCardsInDatabase - сохраняет полученные данные по картам в базу.
-func (s *Storage) SaveCardsInDatabase(ctx context.Context, cards string) error {
-	query := `INSERT INTO cards ( cards) VALUES ($1)`
+func (s *Storage) SaveCardsInDatabase(ctx context.Context, userID int, data string) error {
+	query := `INSERT INTO cards (user_id, cards) VALUES ($1, $2)`
 
-	_, err := s.storage.ExecContext(ctx, query, cards)
+	_, err := s.storage.ExecContext(ctx, query, userID, data)
 	if err != nil {
 		s.log.Error("failed to save in cards", "error", err)
 		return err
@@ -288,13 +288,25 @@ func (s *Storage) SaveCardsInDatabase(ctx context.Context, cards string) error {
 }
 
 // GetAll - возвращает все данные из базы данных.
-func (s *Storage) GetAll(ctx context.Context, tableName string) (*sql.Rows, error) {
-	query := fmt.Sprintf("SELECT * FROM %s", tableName)
-	rows, err := s.storage.QueryContext(ctx, query)
+func (s *Storage) GetAll(ctx context.Context, userID int, tableName string) (*sql.Rows, error) {
+	query := fmt.Sprintf("SELECT * FROM %s WHERE user_id = $1", tableName)
+	rows, err := s.storage.QueryContext(ctx, query, userID)
 	if err != nil {
 		s.log.Error("failed to get all data from database", "error", err)
 		return nil, err
 	}
 
 	return rows, nil
+}
+
+// Deleted - удаляет данные из базы данных.
+func (s *Storage) Deleted(ctx context.Context, tableName string, id int) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", tableName)
+	_, err := s.storage.ExecContext(ctx, query, id)
+	if err != nil {
+		s.log.Error("failed to delete data from database", "error", err)
+		return err
+	}
+
+	return nil
 }

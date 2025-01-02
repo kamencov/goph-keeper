@@ -11,7 +11,7 @@ import (
 	"goph-keeper/internal/services/client/binary_data_client"
 	"goph-keeper/internal/services/client/cards_client"
 	"goph-keeper/internal/services/client/credentials_client"
-	"goph-keeper/internal/services/client/get_all_data"
+	"goph-keeper/internal/services/client/get_and_deleted_data"
 	"goph-keeper/internal/services/client/text_data_client"
 	"goph-keeper/internal/storage/sqlite"
 	"log/slog"
@@ -48,7 +48,7 @@ func RunClient() error {
 	newServiceTextData := text_data_client.NewService(log, db)
 	newServiceBinaryData := binary_data_client.NewService(log, db)
 	newServiceCard := cards_client.NewService(log, db)
-	newServiceGet := get_all_data.NewService(log, db)
+	newServiceData := get_and_deleted_data.NewService(log, db)
 
 	conn, err := grpc.Dial(
 		host,
@@ -73,7 +73,7 @@ func RunClient() error {
 	newSaveHandler := save.NewHandlers(log, newServiceCredentials, newServiceTextData, newServiceBinaryData, newServiceCard)
 
 	// Инициализация интерфейса CLI
-	newCLI := cli.NewCLI(log, newAuthHandler, newSaveHandler, newServiceGet, conn)
+	newCLI := cli.NewCLI(log, newAuthHandler, newSaveHandler, newServiceData, newServiceData, conn)
 
 	// Запуск интерфейса CLI
 

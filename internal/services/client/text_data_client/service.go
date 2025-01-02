@@ -6,7 +6,8 @@ import (
 )
 
 type storageTextDataClient interface {
-	SaveTextDataInDatabase(ctx context.Context, data string) error
+	SaveTextDataInDatabase(ctx context.Context, userID int, data string) error
+	GetUserIDWithToken(ctx context.Context, token string) (int, error)
 }
 
 type ServiceClient struct {
