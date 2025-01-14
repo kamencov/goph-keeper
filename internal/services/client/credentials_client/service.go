@@ -7,7 +7,9 @@ import (
 
 type credentialsClient interface {
 	SaveLoginAndPasswordInCredentials(ctx context.Context, userID int, resource, login, password string) error
+	SaveSync(ctx context.Context, tableName string, userID int, taskID int, action string) error
 	GetUserIDWithToken(ctx context.Context, token string) (int, error)
+	GetIDTaskCredentials(ctx context.Context, tableName string, userID int, task string) (int, error)
 }
 
 type ServiceClient struct {

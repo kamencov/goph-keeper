@@ -1,17 +1,171 @@
 package workers
 
-type credentials struct {
+import (
+	"context"
+	"fmt"
+	"google.golang.org/grpc"
+)
+
+func (s *Service) PushData(ctx context.Context, conn *grpc.ClientConn) error {
+	var (
+		credentials []*Credentials
+		textData    []*TextData
+		binaryData  []*BinaryData
+		cards       []*Cards
+
+		statusBool Status
+	)
+
+	// собираем все данные из таблицы sync_client
+	syncsData, err := s.storage.GetAllSync()
+	if err != nil {
+		s.log.Error("failed to get all data from database", "error", err)
+		return err
+	}
+
+	// проверяем наличие данных
+	if len(syncsData) == 0 {
+		s.log.Error("len sync = 0", "error", err)
+		return err
+	}
+
+	// запускам цикл
+	for _, syncData := range syncsData {
+		// распределяем по таблицам сбор данных
+		switch syncData.TableName {
+		case "credentials":
+			data, err := s.storage.GetDataCredentials(syncData.UserID, syncData.TaskID)
+			if err != nil {
+				return err
+			}
+
+			token, err := s.storage.GetTokenWithUserID(ctx, syncData.UserID)
+			if err != nil {
+				return err
+			}
+
+			data.AccessToken = token
+
+			// добавляем действие
+			data.Action = syncData.Action
+
+			// добавляем в слайс
+			credentials = append(credentials, data)
+
+		case "text_data":
+			data, err := s.storage.GetDataTextData(syncData.UserID, syncData.TaskID)
+			if err != nil {
+				return err
+			}
+
+			// добавляем действие
+			data.Action = syncData.Action
+
+			token, err := s.storage.GetTokenWithUserID(ctx, syncData.UserID)
+			if err != nil {
+				return err
+			}
+
+			data.AccessToken = token
+			// добавляем в слайс
+			textData = append(textData, data)
+
+		case "binary_data":
+			data, err := s.storage.GetDataBinaryData(syncData.UserID, syncData.TaskID)
+			if err != nil {
+				return err
+			}
+
+			// добавляем действие
+			data.Action = syncData.Action
+
+			token, err := s.storage.GetTokenWithUserID(ctx, syncData.UserID)
+			if err != nil {
+				return err
+			}
+
+			data.AccessToken = token
+
+			// добавляем в слайс
+			binaryData = append(binaryData, data)
+
+		case "cards":
+			data, err := s.storage.GetDataCards(syncData.UserID, syncData.TaskID)
+			if err != nil {
+				return err
+			}
+			// добавляем действие
+			data.Action = syncData.Action
+
+			token, err := s.storage.GetTokenWithUserID(ctx, syncData.UserID)
+			if err != nil {
+				return err
+			}
+
+			data.AccessToken = token
+
+			// добавляем в слайс
+			cards = append(cards, data)
+		}
+	}
+
+	// отправляем данные на сервер
+	if err := s.repoSync.SyncCredentials(ctx, conn, credentials); err == nil {
+		statusBool.credentials = true
+	}
+	if err := s.repoSync.SyncTextData(ctx, conn, textData); err == nil {
+		statusBool.textData = true
+	}
+	if err := s.repoSync.SyncBinaryData(ctx, conn, binaryData); err == nil {
+		statusBool.binaryData = true
+	}
+	if err := s.repoSync.SyncCards(ctx, conn, cards); err == nil {
+		statusBool.cards = true
+	}
+
+	// чистим таблицу sync_client
+	if err := s.ClearSync(&statusBool); err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (s *Service) PushData() {
-	rows, err := s.storage.GetAllNewCredentials()
-	if err != nil {
-		s.log.Error("failed to get data from database", "error", err)
-		return
-	}
-	s.log.Info("got data from database", "rows", rows)
+func (s *Service) ClearSync(status *Status) error {
+	var errs []error
 
-	for rows.Next() {
-
+	if status.credentials {
+		if err := s.storage.ClearSyncCredentials(); err != nil {
+			s.log.Error("failed to clear sync credentials", "error", err)
+			errs = append(errs, fmt.Errorf("failed to clear sync credentials: %w", err))
+		}
 	}
+
+	if status.textData {
+		if err := s.storage.ClearSyncTextData(); err != nil {
+			s.log.Error("failed to clear sync text data", "error", err)
+			errs = append(errs, fmt.Errorf("failed to clear sync text data: %w", err))
+		}
+	}
+
+	if status.binaryData {
+		if err := s.storage.ClearSyncBinaryData(); err != nil {
+			s.log.Error("failed to clear sync binary data", "error", err)
+			errs = append(errs, fmt.Errorf("failed to clear sync binary data: %w", err))
+		}
+	}
+
+	if status.cards {
+		if err := s.storage.ClearSyncCards(); err != nil {
+			s.log.Error("failed to clear sync cards", "error", err)
+			errs = append(errs, fmt.Errorf("failed to clear sync cards: %w", err))
+		}
+	}
+
+	if len(errs) > 0 {
+		// Объединяем ошибки в одну
+		return fmt.Errorf("clear sync failed: %v", errs)
+	}
+
+	return nil
 }

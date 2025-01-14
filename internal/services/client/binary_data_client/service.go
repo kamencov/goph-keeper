@@ -7,7 +7,9 @@ import (
 
 type storageClient interface {
 	SaveBinaryDataInDatabase(ctx context.Context, userID int, data string) error
+	SaveSync(ctx context.Context, tableName string, userID int, taskID int, action string) error
 	GetUserIDWithToken(ctx context.Context, token string) (int, error)
+	GetIDTaskBinary(ctx context.Context, tableName string, userID int, task string) (int, error)
 }
 
 type ServiceClient struct {

@@ -629,3 +629,321 @@ var PostCards_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "internal/proto/v1/goph_keeper_v1.proto",
 }
+
+const (
+	Health_Health_FullMethodName = "/goph_keeper_v1.Health/Health"
+)
+
+// HealthClient is the client API for Health service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type HealthClient interface {
+	Health(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
+}
+
+type healthClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewHealthClient(cc grpc.ClientConnInterface) HealthClient {
+	return &healthClient{cc}
+}
+
+func (c *healthClient) Health(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, Health_Health_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// HealthServer is the server API for Health service.
+// All implementations must embed UnimplementedHealthServer
+// for forward compatibility.
+type HealthServer interface {
+	Health(context.Context, *Empty) (*Empty, error)
+	mustEmbedUnimplementedHealthServer()
+}
+
+// UnimplementedHealthServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedHealthServer struct{}
+
+func (UnimplementedHealthServer) Health(context.Context, *Empty) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Health not implemented")
+}
+func (UnimplementedHealthServer) mustEmbedUnimplementedHealthServer() {}
+func (UnimplementedHealthServer) testEmbeddedByValue()                {}
+
+// UnsafeHealthServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to HealthServer will
+// result in compilation errors.
+type UnsafeHealthServer interface {
+	mustEmbedUnimplementedHealthServer()
+}
+
+func RegisterHealthServer(s grpc.ServiceRegistrar, srv HealthServer) {
+	// If the following call pancis, it indicates UnimplementedHealthServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&Health_ServiceDesc, srv)
+}
+
+func _Health_Health_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HealthServer).Health(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Health_Health_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HealthServer).Health(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// Health_ServiceDesc is the grpc.ServiceDesc for Health service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var Health_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "goph_keeper_v1.Health",
+	HandlerType: (*HealthServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Health",
+			Handler:    _Health_Health_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "internal/proto/v1/goph_keeper_v1.proto",
+}
+
+const (
+	SyncFromClient_SyncFromClientCredentials_FullMethodName = "/goph_keeper_v1.SyncFromClient/SyncFromClientCredentials"
+	SyncFromClient_SyncFromClientTextData_FullMethodName    = "/goph_keeper_v1.SyncFromClient/SyncFromClientTextData"
+	SyncFromClient_SyncFromClientBinaryData_FullMethodName  = "/goph_keeper_v1.SyncFromClient/SyncFromClientBinaryData"
+	SyncFromClient_SyncFromClientCards_FullMethodName       = "/goph_keeper_v1.SyncFromClient/SyncFromClientCards"
+)
+
+// SyncFromClientClient is the client API for SyncFromClient service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type SyncFromClientClient interface {
+	SyncFromClientCredentials(ctx context.Context, in *SyncFromClientCredentialsRequest, opts ...grpc.CallOption) (*Empty, error)
+	SyncFromClientTextData(ctx context.Context, in *SyncFromClientTextDataRequest, opts ...grpc.CallOption) (*Empty, error)
+	SyncFromClientBinaryData(ctx context.Context, in *SyncFromClientBinaryDataRequest, opts ...grpc.CallOption) (*Empty, error)
+	SyncFromClientCards(ctx context.Context, in *SyncFromClientCardsRequest, opts ...grpc.CallOption) (*Empty, error)
+}
+
+type syncFromClientClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewSyncFromClientClient(cc grpc.ClientConnInterface) SyncFromClientClient {
+	return &syncFromClientClient{cc}
+}
+
+func (c *syncFromClientClient) SyncFromClientCredentials(ctx context.Context, in *SyncFromClientCredentialsRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, SyncFromClient_SyncFromClientCredentials_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *syncFromClientClient) SyncFromClientTextData(ctx context.Context, in *SyncFromClientTextDataRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, SyncFromClient_SyncFromClientTextData_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *syncFromClientClient) SyncFromClientBinaryData(ctx context.Context, in *SyncFromClientBinaryDataRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, SyncFromClient_SyncFromClientBinaryData_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *syncFromClientClient) SyncFromClientCards(ctx context.Context, in *SyncFromClientCardsRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, SyncFromClient_SyncFromClientCards_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// SyncFromClientServer is the server API for SyncFromClient service.
+// All implementations must embed UnimplementedSyncFromClientServer
+// for forward compatibility.
+type SyncFromClientServer interface {
+	SyncFromClientCredentials(context.Context, *SyncFromClientCredentialsRequest) (*Empty, error)
+	SyncFromClientTextData(context.Context, *SyncFromClientTextDataRequest) (*Empty, error)
+	SyncFromClientBinaryData(context.Context, *SyncFromClientBinaryDataRequest) (*Empty, error)
+	SyncFromClientCards(context.Context, *SyncFromClientCardsRequest) (*Empty, error)
+	mustEmbedUnimplementedSyncFromClientServer()
+}
+
+// UnimplementedSyncFromClientServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedSyncFromClientServer struct{}
+
+func (UnimplementedSyncFromClientServer) SyncFromClientCredentials(context.Context, *SyncFromClientCredentialsRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SyncFromClientCredentials not implemented")
+}
+func (UnimplementedSyncFromClientServer) SyncFromClientTextData(context.Context, *SyncFromClientTextDataRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SyncFromClientTextData not implemented")
+}
+func (UnimplementedSyncFromClientServer) SyncFromClientBinaryData(context.Context, *SyncFromClientBinaryDataRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SyncFromClientBinaryData not implemented")
+}
+func (UnimplementedSyncFromClientServer) SyncFromClientCards(context.Context, *SyncFromClientCardsRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SyncFromClientCards not implemented")
+}
+func (UnimplementedSyncFromClientServer) mustEmbedUnimplementedSyncFromClientServer() {}
+func (UnimplementedSyncFromClientServer) testEmbeddedByValue()                        {}
+
+// UnsafeSyncFromClientServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to SyncFromClientServer will
+// result in compilation errors.
+type UnsafeSyncFromClientServer interface {
+	mustEmbedUnimplementedSyncFromClientServer()
+}
+
+func RegisterSyncFromClientServer(s grpc.ServiceRegistrar, srv SyncFromClientServer) {
+	// If the following call pancis, it indicates UnimplementedSyncFromClientServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&SyncFromClient_ServiceDesc, srv)
+}
+
+func _SyncFromClient_SyncFromClientCredentials_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SyncFromClientCredentialsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SyncFromClientServer).SyncFromClientCredentials(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SyncFromClient_SyncFromClientCredentials_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SyncFromClientServer).SyncFromClientCredentials(ctx, req.(*SyncFromClientCredentialsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SyncFromClient_SyncFromClientTextData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SyncFromClientTextDataRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SyncFromClientServer).SyncFromClientTextData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SyncFromClient_SyncFromClientTextData_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SyncFromClientServer).SyncFromClientTextData(ctx, req.(*SyncFromClientTextDataRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SyncFromClient_SyncFromClientBinaryData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SyncFromClientBinaryDataRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SyncFromClientServer).SyncFromClientBinaryData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SyncFromClient_SyncFromClientBinaryData_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SyncFromClientServer).SyncFromClientBinaryData(ctx, req.(*SyncFromClientBinaryDataRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SyncFromClient_SyncFromClientCards_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SyncFromClientCardsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SyncFromClientServer).SyncFromClientCards(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SyncFromClient_SyncFromClientCards_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SyncFromClientServer).SyncFromClientCards(ctx, req.(*SyncFromClientCardsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// SyncFromClient_ServiceDesc is the grpc.ServiceDesc for SyncFromClient service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var SyncFromClient_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "goph_keeper_v1.SyncFromClient",
+	HandlerType: (*SyncFromClientServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "SyncFromClientCredentials",
+			Handler:    _SyncFromClient_SyncFromClientCredentials_Handler,
+		},
+		{
+			MethodName: "SyncFromClientTextData",
+			Handler:    _SyncFromClient_SyncFromClientTextData_Handler,
+		},
+		{
+			MethodName: "SyncFromClientBinaryData",
+			Handler:    _SyncFromClient_SyncFromClientBinaryData_Handler,
+		},
+		{
+			MethodName: "SyncFromClientCards",
+			Handler:    _SyncFromClient_SyncFromClientCards_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "internal/proto/v1/goph_keeper_v1.proto",
+}

@@ -1,4 +1,34 @@
-time=2025-01-02T14:23:23.321+03:00 level=INFO msg="connected to database"
-time=2025-01-02T14:23:26.941+03:00 level=INFO msg="Switching to AuthUser page"
-time=2025-01-02T14:23:36.100+03:00 level=INFO msg="access token updated"
-time=2025-01-02T14:23:53.258+03:00 level=INFO msg="start credentials"
+time=2025-01-12T21:49:21.979+03:00 level=INFO msg="Switching to AuthUser page"
+time=2025-01-12T21:49:23.857+03:00 level=INFO msg="access token updated"
+time=2025-01-12T21:49:24.859+03:00 level=WARN msg="no credentials to sync"
+time=2025-01-12T21:49:25.858+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:26.858+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:27.858+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:28.858+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:29.858+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:30.858+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:31.860+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:32.859+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:33.858+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:34.858+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:35.858+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:36.858+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:37.857+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:38.857+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:39.857+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:40.857+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:41.858+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:42.858+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:43.858+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:44.858+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:45.857+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:46.857+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:47.857+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:48.857+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:49.857+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:50.857+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:51.857+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:52.857+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:53.857+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:54.857+03:00 level=ERROR msg="len sync = 0" error=<nil>
+time=2025-01-12T21:49:55.857+03:00 level=ERROR msg="len sync = 0" error=<nil>

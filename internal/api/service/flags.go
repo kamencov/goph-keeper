@@ -9,7 +9,6 @@ import (
 
 type Flags struct {
 	log          *slog.Logger
-	Repo         string
 	AddrGRPC     string
 	TokenSalt    []byte
 	PasswordSalt []byte
@@ -27,7 +26,6 @@ func (f *Flags) Parse() {
 }
 
 func (f *Flags) parsFlags() {
-	flag.StringVar(&f.Repo, "repo", "2", "1 - memory, 2 - postgres")
 	flag.StringVar(&f.AddrGRPC, "addr", ":8081", "gRPC address")
 }
 

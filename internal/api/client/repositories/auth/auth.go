@@ -8,8 +8,12 @@ import (
 )
 
 type service interface {
-	SaveTokenInBase(ctx context.Context, login, token string) error
+	SaveTokenInBase(ctx context.Context, login, password, token string) error
+	CheckUser(ctx context.Context, login, password string) (string, error)
 }
+
+// SignalAuth - сигнал об авторизации
+var SignalAuth = make(chan bool)
 
 type Handlers struct {
 	log     *slog.Logger
@@ -33,7 +37,7 @@ func (h *Handlers) RegisterUser(ctx context.Context, conn *grpc.ClientConn, logi
 	})
 
 	if err != nil {
-		h.log.Error("auth.handlers.app: failed to register user")
+		h.log.Error("auth.repositories.app: failed to register user")
 		return err
 	}
 	return nil
@@ -52,10 +56,24 @@ func (h *Handlers) AuthUser(ctx context.Context, conn *grpc.ClientConn, login, p
 		return "", err
 	}
 
-	err = h.service.SaveTokenInBase(ctx, login, token.Token)
+	err = h.service.SaveTokenInBase(ctx, login, password, token.Token)
 	if err != nil {
-		h.log.Error("failed to save token", "error", err)
+		h.log.Error("failed to handlers token", "error", err)
 		return "", err
 	}
+
+	// сигнализируем об авторизации
+	SignalAuth <- true
+
 	return token.Token, nil
+}
+
+func (h *Handlers) AuthUserOffLine(ctx context.Context, login, password string) (string, error) {
+
+	token, err := h.service.CheckUser(ctx, login, password)
+	if err != nil {
+		h.log.Error("failed to check user", "error", err)
+		return "", err
+	}
+	return token, nil
 }

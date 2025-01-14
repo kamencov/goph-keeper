@@ -32,6 +32,28 @@ func (c *CLI) buttonsStart(ctx context.Context, app *tview.Application, pages *t
 	return form
 }
 
+func (c *CLI) buttonsOffline(ctx context.Context, app *tview.Application, pages *tview.Pages) *tview.Form {
+	form := tview.NewForm()
+	form.
+		AddButton("Auth", func() {
+			c.log.Info("Switching to AuthUser page")
+			pages.AddPage("AuthUser", c.authUserOffline(ctx, app, pages), true, false)
+			pages.SwitchToPage("AuthUser")
+		}).
+		AddButton("Quit", func() {
+			c.log.Info("Stopping application")
+			app.Stop()
+		})
+
+	form.SetBorder(true).SetTitle("goph-keeper").
+		SetTitleAlign(tview.AlignCenter)
+
+	form.AddFormItem(tview.NewTextView().SetText("Добро пожаловать в оффлаин режим!\n" +
+		"Данный режим только для уже зарегистрированных пользователей\n"))
+
+	return form
+}
+
 func (c *CLI) buttonsData(ctx context.Context, app *tview.Application, pages *tview.Pages) *tview.Form {
 	form := tview.NewForm()
 	form.

@@ -40,10 +40,10 @@ func (c *CLI) saveTextData(ctx context.Context, app *tview.Application, pages *t
 				// Возврат в главное меню после сохранения
 				err := c.save.PostTextData(ctx, c.token, textData.Text)
 				if err != nil {
-					c.log.Error("failed save credentials", "error", err)
+					c.log.Error("failed handlers credentials", "error", err)
 					c.errorsSaveText(ctx, app, pages)
 				} else {
-					pages.SwitchToPage("Text")
+					pages.SwitchToPage("Buttons_data")
 				}
 			} else if buttonLabel == "Correct" {
 				pages.SwitchToPage("Text")

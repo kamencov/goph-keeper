@@ -81,3 +81,32 @@ func (c *CLI) authUser(ctx context.Context, app *tview.Application, pages *tview
 
 	return form
 }
+
+func (c *CLI) authUserOffline(ctx context.Context, app *tview.Application, pages *tview.Pages) *tview.Form {
+
+	var reg Register
+
+	form := tview.NewForm().
+		AddInputField("Login", "", 20, nil, func(text string) {
+			reg.Login = text
+		}).
+		AddInputField("Password", "", 20, nil, func(text string) {
+			reg.Password = text
+		}).
+		AddButton("Save", func() {
+			token, err := c.auth.AuthUserOffLine(ctx, reg.Login, reg.Password)
+			if err != nil {
+				c.errorsAuth(ctx, app, pages)
+			} else {
+				c.token = token
+				pages.AddPage("Buttons_data", c.buttonsData(ctx, app, pages), true, false)
+				pages.SwitchToPage("Buttons_data")
+			}
+		}).
+		AddButton("Quit", func() {
+			app.Stop()
+		})
+	form.SetBorder(true).SetTitle("Авторизоваться на сервере").SetTitleAlign(tview.AlignCenter)
+
+	return form
+}

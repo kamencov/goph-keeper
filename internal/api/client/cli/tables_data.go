@@ -106,7 +106,7 @@ func (c *CLI) getResource(ctx context.Context,
 					// Показываем контекстное меню
 					menu := tview.NewModal().
 						SetText(fmt.Sprintf("Действия с данными: %v", data)).
-						AddButtons([]string{"Copy", "Delete", "Edit", "Cancel"}).
+						AddButtons([]string{"Copy", "Delete", "Cancel"}).
 						SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 							switch buttonLabel {
 							case "Copy":
@@ -114,8 +114,6 @@ func (c *CLI) getResource(ctx context.Context,
 							case "Delete":
 								c.delData(ctx, tableName, data, pages)
 								columns.Clear()
-							case "Edit":
-
 							}
 							pages.RemovePage("Menu")
 						})
@@ -188,7 +186,7 @@ func (c *CLI) delData(ctx context.Context, tableName string, data []string, page
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if buttonLabel == "OK" {
 				// Удаление данных
-				err := c.deleted.DeletedData(ctx, tableName, id)
+				err := c.deleted.DeletedData(ctx, c.token, tableName, id)
 				if err != nil {
 					c.log.Error("failed to delete data", "error", err)
 					// Отображаем сообщение об ошибке

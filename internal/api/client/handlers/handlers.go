@@ -1,4 +1,4 @@
-package save
+package handlers
 
 import (
 	"context"
@@ -53,7 +53,7 @@ func (h *Handler) PostLoginAndPassword(ctx context.Context, token, resource, log
 
 	err := h.serviceCredentials.SaveLoginAndPassword(ctx, token, resource, login, password)
 	if err != nil {
-		h.log.Error("failed to save login and password", "error", err)
+		h.log.Error("failed to handlers login and password", "error", err)
 		return err
 	}
 

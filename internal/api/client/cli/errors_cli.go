@@ -35,8 +35,8 @@ func (c *CLI) errorsAuth(ctx context.Context, app *tview.Application, pages *tvi
 		AddButtons([]string{"Auth", "Cancel"}).
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if buttonLabel == "Auth" {
-				pages.AddPage("Register", c.register(ctx, app, pages), true, false)
-				pages.SwitchToPage("Register")
+				pages.AddPage("Auth", c.authUser(ctx, app, pages), true, false)
+				pages.SwitchToPage("Auth")
 			} else {
 				app.Stop()
 			}
@@ -44,6 +44,26 @@ func (c *CLI) errorsAuth(ctx context.Context, app *tview.Application, pages *tvi
 
 	// Добавляем модальное окно как новую страницу
 	pages.AddPage("ErrorsAuth", model, true, true)
+}
+
+func (c *CLI) errorsAuthOffLine(ctx context.Context, app *tview.Application, pages *tview.Pages) {
+	model := tview.NewModal()
+	model.SetText("Что-то пошло не так\n" +
+		"Выберите действие:\n" +
+		"1. Auth: Повторно пройти авторизацию\n" +
+		"2. Cancel: Закрыть приложение\n").
+		AddButtons([]string{"Auth", "Cancel"}).
+		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+			if buttonLabel == "Auth" {
+				pages.AddPage("AuthOffLine", c.authUserOffline(ctx, app, pages), true, false)
+				pages.SwitchToPage("AuthOffLine")
+			} else {
+				app.Stop()
+			}
+		})
+
+	// Добавляем модальное окно как новую страницу
+	pages.AddPage("ErrorsAuthOffLine", model, true, true)
 }
 
 func (c *CLI) errorsSaveCredentials(ctx context.Context, app *tview.Application, pages *tview.Pages) {

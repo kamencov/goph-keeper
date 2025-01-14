@@ -45,15 +45,16 @@ func (c *CLI) saveCardData(ctx context.Context, app *tview.Application, pages *t
 		if buttonLabel == "Save" {
 			err := c.save.PostCards(ctx, c.token, cardData.Data)
 			if err != nil {
-				c.log.Error("failed save credentials", "error", err)
+				c.log.Error("failed handlers credentials", "error", err)
 				c.errorsSaveCards(ctx, app, pages)
 			} else {
 				pages.SwitchToPage("Buttons_data")
 			}
 		} else if buttonLabel == "Correct" {
+			// Возвращаем пользователя к заполнению данных
 			pages.SwitchToPage("Card")
 		} else {
-			// Возврат к форме ввода данных
+			// Очищаем форму и возвращаемся к заполнению
 			clearFormCard(form, cardData)
 			pages.SwitchToPage("Card")
 		}

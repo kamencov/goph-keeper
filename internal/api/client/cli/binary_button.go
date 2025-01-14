@@ -39,7 +39,7 @@ func (c *CLI) saveBinaryData(ctx context.Context, app *tview.Application, pages 
 		if buttonLabel == "Save" {
 			err := c.save.PostBinaryData(ctx, c.token, binaryData.Data)
 			if err != nil {
-				c.log.Error("failed save credentials", "error", err)
+				c.log.Error("failed handlers credentials", "error", err)
 				c.errorsSaveBinary(ctx, app, pages)
 			} else {
 				pages.SwitchToPage("Buttons_data")

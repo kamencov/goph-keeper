@@ -32,7 +32,7 @@ func (s *ServiceAuth) Auth(login, password string) (Tokens, error) {
 		return Tokens{}, ErrWrongPassword
 	}
 
-	token, err := s.generateToken(login)
+	token, err := s.GenerateToken(login)
 	if err != nil {
 		return Tokens{}, err
 	}
@@ -47,8 +47,8 @@ func (s *ServiceAuth) doPasswordMatch(hashedPassword, password string) bool {
 	return hashedPassword == currPasswordHash
 }
 
-// generateToken - генерация токена.
-func (s *ServiceAuth) generateToken(login string) (Tokens, error) {
+// GenerateToken - генерация токена.
+func (s *ServiceAuth) GenerateToken(login string) (Tokens, error) {
 	accessToken, err := s.generateAccessToken(login)
 	if err != nil {
 		return Tokens{}, err
@@ -93,4 +93,19 @@ func (s *ServiceAuth) ValidateToken(ctx context.Context, token string) (int, err
 	}
 
 	return uid, nil
+}
+
+// CreatTokenForUser создает JWT-токен для пользователя.
+func (sa *ServiceAuth) CreatTokenForUser(userID string) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id": userID,
+		"exp":     time.Now().Add(time.Hour * 24).Unix(), // Устанавливаем срок действия токена на 24 часа
+	})
+
+	signedToken, err := token.SignedString(sa.passwordSalt)
+	if err != nil {
+		return "", err
+	}
+
+	return signedToken, nil
 }

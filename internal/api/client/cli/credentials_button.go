@@ -68,7 +68,7 @@ func (c *CLI) saveResource(
 			case "Save":
 				err := c.save.PostLoginAndPassword(ctx, c.token, resource.Resource, resource.Login, resource.Password)
 				if err != nil {
-					c.log.Error("failed save credentials", "error", err)
+					c.log.Error("failed handlers credentials", "error", err)
 					c.errorsSaveCredentials(ctx, app, pages)
 				} else {
 					pages.SwitchToPage("Buttons_data")

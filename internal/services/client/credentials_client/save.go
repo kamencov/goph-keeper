@@ -20,7 +20,18 @@ func (s *ServiceClient) SaveLoginAndPassword(ctx context.Context, token, resourc
 
 	err = s.storage.SaveLoginAndPasswordInCredentials(ctx, userID, resource, login, password)
 	if err != nil {
-		s.log.Error("failed to save data")
+		s.log.Error("failed to handlers data")
+		return err
+	}
+
+	idTask, err := s.storage.GetIDTaskCredentials(ctx, "credentials", userID, resource)
+	if err != nil {
+		s.log.Error("failed to get id task")
+		return err
+	}
+
+	if err = s.storage.SaveSync(ctx, "credentials", userID, idTask, "save"); err != nil {
+		s.log.Error("failed to save sync")
 		return err
 	}
 

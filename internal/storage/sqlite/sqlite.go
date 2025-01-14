@@ -50,7 +50,6 @@ func (s *Storage) init(dbPath string) error {
 	}
 
 	s.storage = db
-	s.log.Info("connected to database")
 
 	err = s.createTableIfNotExists()
 	if err != nil {
@@ -97,6 +96,7 @@ func (s *Storage) createTableIfNotExists() (err error) {
 	query := `CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT, 
         login TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL,
         token TEXT,
         updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     )`
@@ -114,6 +114,7 @@ func (s *Storage) createTableIfNotExists() (err error) {
         login TEXT NOT NULL,
         password TEXT NOT NULL,
         updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		deleted_status INTEGER NOT NULL DEFAULT 0,
         FOREIGN KEY (user_id) REFERENCES users(id)
     )`
 	_, err = tx.Exec(query)
@@ -128,6 +129,7 @@ func (s *Storage) createTableIfNotExists() (err error) {
         user_id INTEGER NOT NULL, 
         text TEXT NOT NULL,
         updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		deleted_status INTEGER NOT NULL DEFAULT 0,
         FOREIGN KEY (user_id) REFERENCES users(id)
     )`
 	_, err = tx.Exec(query)
@@ -142,6 +144,7 @@ func (s *Storage) createTableIfNotExists() (err error) {
         user_id INTEGER NOT NULL, 
         binary_data BLOB NOT NULL,
         updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		deleted_status INTEGER NOT NULL DEFAULT 0,
         FOREIGN KEY (user_id) REFERENCES users(id)
     )`
 	_, err = tx.Exec(query)
@@ -156,11 +159,29 @@ func (s *Storage) createTableIfNotExists() (err error) {
         user_id INTEGER NOT NULL, 
         cards TEXT NOT NULL,
         updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        deleted_status INTEGER NOT NULL DEFAULT 0, -- 0 - не удалено, 1 - удалено 
         FOREIGN KEY (user_id) REFERENCES users(id)
     )`
 	_, err = tx.Exec(query)
 	if err != nil {
 		s.log.Error("failed to create table - cards:", "error", err)
+		return err
+	}
+
+	// Создаем таблицу для синхронизации
+	query = `CREATE TABLE IF NOT EXISTS sync_client (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		user_id INTEGER NOT NULL,
+		table_name TEXT NOT NULL,
+		task_id INTEGER NOT NULL,
+		action TEXT NOT NULL,
+		updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		FOREIGN KEY (user_id) REFERENCES users(id)
+	)`
+
+	_, err = tx.Exec(query)
+	if err != nil {
+		s.log.Error("failed to create table - sync_client:", "error", err)
 		return err
 	}
 
@@ -202,11 +223,51 @@ func (s *Storage) GetUserIDWithToken(ctx context.Context, token string) (int, er
 	return userID, nil
 }
 
-// SaveLoginAndToken - сохраняет логин и токен в базе данных.
-func (s *Storage) SaveLoginAndToken(ctx context.Context, login, token string) error {
+func (s *Storage) GetUserPassword(ctx context.Context, login string) (string, error) {
+	query := `SELECT password FROM users WHERE login = $1`
 
-	query := `INSERT INTO users (login, token) VALUES ($1, $2)`
-	_, err := s.storage.ExecContext(ctx, query, login, token)
+	var password string
+
+	if err := s.storage.QueryRowContext(ctx, query, login).Scan(&password); err != nil {
+		s.log.Error("failed to check login in base", "error", err)
+		return "", err
+	}
+
+	return password, nil
+}
+
+func (s *Storage) GetUserToken(ctx context.Context, login string) (string, error) {
+	query := `SELECT token FROM users WHERE login = $1`
+
+	var token string
+
+	if err := s.storage.QueryRowContext(ctx, query, login).Scan(&token); err != nil {
+		s.log.Error("failed to check login in base", "error", err)
+		return "", err
+	}
+
+	return token, nil
+}
+
+// GetTokenWithUserID - возвращает токен пользователя по его ID.
+func (s *Storage) GetTokenWithUserID(ctx context.Context, userID int) (string, error) {
+	query := `SELECT token FROM users WHERE id = $1`
+
+	var token string
+
+	if err := s.storage.QueryRowContext(ctx, query, userID).Scan(&token); err != nil {
+		s.log.Error("failed to check login in base", "error", err)
+		return "", err
+	}
+
+	return token, nil
+}
+
+// SaveLoginAndToken - сохраняет логин и токен в базе данных.
+func (s *Storage) SaveLoginAndToken(ctx context.Context, login, password, token string) error {
+
+	query := `INSERT INTO users (login, password, token) VALUES ($1, $2, $3)`
+	_, err := s.storage.ExecContext(ctx, query, login, password, token)
 	if err != nil {
 		s.log.Error("failed to update access token", "error", err)
 		return err
@@ -241,33 +302,33 @@ func (s *Storage) SaveLoginAndPasswordInCredentials(
 
 	_, err := s.storage.ExecContext(ctx, query, userID, resource, login, password)
 	if err != nil {
-		s.log.Error("failed to save in credentials", "error", err)
+		s.log.Error("failed to handlers in credentials", "error", err)
 		return err
 	}
 
 	return nil
 }
 
-// SaveTextData - сохраняет получены текст в базу.
+// SaveTextDataInDatabase - сохраняет получены текст в базу.
 func (s *Storage) SaveTextDataInDatabase(ctx context.Context, userID int, data string) error {
 	query := `INSERT INTO text_data (user_id, text) VALUES ($1, $2)`
 
 	_, err := s.storage.ExecContext(ctx, query, userID, data)
 	if err != nil {
-		s.log.Error("failed to save in credentials", "error", err)
+		s.log.Error("failed to handlers in text", "error", err)
 		return err
 	}
 
 	return nil
 }
 
-// SaveBinaryData - сохраняет полученные бинарные данные.
+// SaveBinaryDataInDatabase - сохраняет полученные бинарные данные.
 func (s *Storage) SaveBinaryDataInDatabase(ctx context.Context, userID int, data string) error {
 	query := `INSERT INTO binary_data (user_id, binary_data) VALUES ($1, $2)`
 
 	_, err := s.storage.ExecContext(ctx, query, userID, data)
 	if err != nil {
-		s.log.Error("failed to save in credentials", "error", err)
+		s.log.Error("failed to handlers in binary", "error", err)
 		return err
 	}
 
@@ -280,7 +341,20 @@ func (s *Storage) SaveCardsInDatabase(ctx context.Context, userID int, data stri
 
 	_, err := s.storage.ExecContext(ctx, query, userID, data)
 	if err != nil {
-		s.log.Error("failed to save in cards", "error", err)
+		s.log.Error("failed to handlers in cards", "error", err)
+		return err
+	}
+
+	return nil
+}
+
+func (s *Storage) SaveSync(ctx context.Context, tableName string, userID int, taskID int, action string) error {
+
+	query := `INSERT INTO sync_client (user_id, table_name, task_id, action) VALUES ($1, $2, $3, $4)`
+
+	_, err := s.storage.ExecContext(ctx, query, userID, tableName, taskID, action)
+	if err != nil {
+		s.log.Error("failed to handlers in sync", "error", err)
 		return err
 	}
 
@@ -289,7 +363,7 @@ func (s *Storage) SaveCardsInDatabase(ctx context.Context, userID int, data stri
 
 // GetAll - возвращает все данные из базы данных.
 func (s *Storage) GetAll(ctx context.Context, userID int, tableName string) (*sql.Rows, error) {
-	query := fmt.Sprintf("SELECT * FROM %s WHERE user_id = $1", tableName)
+	query := fmt.Sprintf("SELECT * FROM %s WHERE user_id = $1 AND deleted_status = 0", tableName)
 	rows, err := s.storage.QueryContext(ctx, query, userID)
 	if err != nil {
 		s.log.Error("failed to get all data from database", "error", err)
@@ -299,9 +373,58 @@ func (s *Storage) GetAll(ctx context.Context, userID int, tableName string) (*sq
 	return rows, nil
 }
 
+// GetIDTask - получаем ID задачи.
+func (s *Storage) GetIDTaskCredentials(ctx context.Context, tableName string, userID int, task string) (int, error) {
+	var id int32
+
+	query := fmt.Sprintf("SELECT id FROM %s WHERE user_id = $1 AND  resource = $2", tableName)
+	if err := s.storage.QueryRowContext(ctx, query, userID, task).Scan(&id); err != nil {
+		s.log.Error("failed to get all data from database", "error", err)
+		return -1, err
+	}
+
+	return int(id), nil
+}
+
+func (s *Storage) GetIDTaskText(ctx context.Context, tableName string, userID int, task string) (int, error) {
+	var id int32
+
+	query := fmt.Sprintf("SELECT id FROM %s WHERE user_id = $1 AND  text = $2", tableName)
+	if err := s.storage.QueryRowContext(ctx, query, userID, task).Scan(&id); err != nil {
+		s.log.Error("failed to get all data from database", "error", err)
+		return -1, err
+	}
+
+	return int(id), nil
+}
+
+func (s *Storage) GetIDTaskBinary(ctx context.Context, tableName string, userID int, task string) (int, error) {
+	var id int32
+
+	query := fmt.Sprintf("SELECT id FROM %s WHERE user_id = $1 AND  binary_data = $2", tableName)
+	if err := s.storage.QueryRowContext(ctx, query, userID, task).Scan(&id); err != nil {
+		s.log.Error("failed to get all data from database", "error", err)
+		return -1, err
+	}
+
+	return int(id), nil
+}
+
+func (s *Storage) GetIDTaskCards(ctx context.Context, tableName string, userID int, task string) (int, error) {
+	var id int32
+
+	query := fmt.Sprintf("SELECT id FROM %s WHERE user_id = $1 AND  cards = $2", tableName)
+	if err := s.storage.QueryRowContext(ctx, query, userID, task).Scan(&id); err != nil {
+		s.log.Error("failed to get all data from database", "error", err)
+		return -1, err
+	}
+
+	return int(id), nil
+}
+
 // Deleted - удаляет данные из базы данных.
 func (s *Storage) Deleted(ctx context.Context, tableName string, id int) error {
-	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", tableName)
+	query := fmt.Sprintf("UPDATE %s SET deleted_status = 1 WHERE id = $1", tableName)
 	_, err := s.storage.ExecContext(ctx, query, id)
 	if err != nil {
 		s.log.Error("failed to delete data from database", "error", err)

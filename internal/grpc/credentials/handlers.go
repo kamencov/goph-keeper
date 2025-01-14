@@ -5,7 +5,7 @@ import (
 	"errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"goph-keeper/internal/middleware"
+	"goph-keeper/internal/middleware/auth"
 	pd "goph-keeper/internal/proto/v1"
 	"goph-keeper/internal/services/server/credentials"
 	"log/slog"
@@ -39,7 +39,7 @@ func (h *Handlers) PostLoginAndPassword(ctx context.Context, in *pd.PostLoginAnd
 		return nil, status.Errorf(codes.InvalidArgument, "password or login is empty")
 	}
 
-	userID := ctx.Value(middleware.UserIDContextKey).(int)
+	userID := ctx.Value(auth.UserIDContextKey).(int)
 
 	err := h.service.SaveLoginAndPassword(ctx, userID, in.GetResource(), in.GetLogin(), in.GetPassword())
 
@@ -48,11 +48,11 @@ func (h *Handlers) PostLoginAndPassword(ctx context.Context, in *pd.PostLoginAnd
 			h.log.Error("failed to get login in base", "error", err)
 			return nil, status.Errorf(codes.NotFound, "login is not correct")
 		}
-		h.log.Error("failed to save login and password", "error", err)
-		return nil, status.Errorf(codes.Internal, "failed to save login and password")
+		h.log.Error("failed to handlers login and password", "error", err)
+		return nil, status.Errorf(codes.Internal, "failed to handlers login and password")
 	}
 
 	return &pd.Empty{
-		Message: "save complete",
+		Message: "handlers complete",
 	}, nil
 }
