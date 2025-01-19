@@ -1,4 +1,4 @@
-[![codecov](https://codecov.io/gh/kamencov/goph-keeper/graph/badge.svg?token=1ZHJfDLN5k)](https://codecov.io/gh/kamencov/goph-keeper)
+[![codecov](https://codecov.io/gh/kamencov/goph-keeper/branch/iter3/graph/badge.svg?token=1ZHJfDLN5k)](https://codecov.io/gh/kamencov/goph-keeper)
 # goph-keeper
 
 Шаги:
