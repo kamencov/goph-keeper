@@ -375,7 +375,7 @@ func (s *Storage) GetAll(ctx context.Context, userID int, tableName string) (*sq
 	return rows, nil
 }
 
-// GetIDTask - получаем ID задачи.
+// GetIDTaskCredentials - получаем ID задачи.
 func (s *Storage) GetIDTaskCredentials(ctx context.Context, tableName string, userID int, task string) (int, error) {
 	var id int32
 
@@ -388,6 +388,7 @@ func (s *Storage) GetIDTaskCredentials(ctx context.Context, tableName string, us
 	return int(id), nil
 }
 
+// GetIDTaskText - получаем ID задачи.
 func (s *Storage) GetIDTaskText(ctx context.Context, tableName string, userID int, task string) (int, error) {
 	var id int32
 
@@ -400,6 +401,7 @@ func (s *Storage) GetIDTaskText(ctx context.Context, tableName string, userID in
 	return int(id), nil
 }
 
+// GetIDTaskBinary - получаем ID задачи.
 func (s *Storage) GetIDTaskBinary(ctx context.Context, tableName string, userID int, task string) (int, error) {
 	var id int32
 
@@ -412,6 +414,7 @@ func (s *Storage) GetIDTaskBinary(ctx context.Context, tableName string, userID 
 	return int(id), nil
 }
 
+// GetIDTaskCards - получаем ID задачи.
 func (s *Storage) GetIDTaskCards(ctx context.Context, tableName string, userID int, task string) (int, error) {
 	var id int32
 

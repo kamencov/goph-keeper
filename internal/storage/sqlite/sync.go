@@ -1,8 +1,13 @@
 package sqlite
 
 import (
+	"errors"
 	"goph-keeper/internal/services/workers"
 	"time"
+)
+
+var (
+	errParseTime = errors.New("failed to parse updated_at")
 )
 
 // GetAllSync - возвращает все данные из базы данных.
@@ -30,7 +35,7 @@ func (s *Storage) GetAllSync() ([]*workers.SyncModel, error) {
 		parsedTime, err := time.Parse("2006-01-02 15:04:05", updatedAt)
 		if err != nil {
 			s.log.Error("failed to parse updated_at", "error", err)
-			return nil, err
+			return nil, errParseTime
 		}
 		sync.UpdatedAt = parsedTime
 
@@ -56,7 +61,7 @@ func (s *Storage) GetDataCredentials(userID, taskID int) (*workers.Credentials, 
 	parsedTime, err := time.Parse("2006-01-02 15:04:05", updatedAt)
 	if err != nil {
 		s.log.Error("failed to parse updated_at", "error", err)
-		return nil, err
+		return nil, errParseTime
 	}
 	cred.UpdatedAt = parsedTime
 
@@ -79,7 +84,7 @@ func (s *Storage) GetDataTextData(userID, taskID int) (*workers.TextData, error)
 	parsedTime, err := time.Parse("2006-01-02 15:04:05", updatedAt)
 	if err != nil {
 		s.log.Error("failed to parse updated_at", "error", err)
-		return nil, err
+		return nil, errParseTime
 	}
 	cred.UpdatedAt = parsedTime
 
@@ -102,7 +107,7 @@ func (s *Storage) GetDataBinaryData(userID, taskID int) (*workers.BinaryData, er
 	parsedTime, err := time.Parse("2006-01-02 15:04:05", updatedAt)
 	if err != nil {
 		s.log.Error("failed to parse updated_at", "error", err)
-		return nil, err
+		return nil, errParseTime
 	}
 	cred.UpdatedAt = parsedTime
 
@@ -125,7 +130,7 @@ func (s *Storage) GetDataCards(userID, taskID int) (*workers.Cards, error) {
 	parsedTime, err := time.Parse("2006-01-02 15:04:05", updatedAt)
 	if err != nil {
 		s.log.Error("failed to parse updated_at", "error", err)
-		return nil, err
+		return nil, errParseTime
 	}
 	cred.UpdatedAt = parsedTime
 

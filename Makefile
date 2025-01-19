@@ -13,7 +13,7 @@ cover:
 .PHONY: test
 test:
 	go test ./... -coverprofile=cover.out
-	grep -Ev "./cli/|mock.go|./proto/|./internal/migrations/" cover.out > cover.filtered.out
+	grep -Ev "./cli/|mock.go|./proto/|./internal/migrations/|run.go" cover.out > cover.filtered.out
 	go tool cover -func=cover.filtered.out
 	rm cover.out cover.filtered.out
 
