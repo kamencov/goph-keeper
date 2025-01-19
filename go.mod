@@ -3,6 +3,7 @@ module goph-keeper
 go 1.22.8
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/atotto/clipboard v0.1.4
 	github.com/gdamore/tcell/v2 v2.7.4
 	github.com/golang-jwt/jwt/v4 v4.5.1
