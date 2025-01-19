@@ -32,6 +32,15 @@ func NewHandlers(log *slog.Logger, service serviceRegister) *Handlers {
 }
 
 // Register - регистрация пользователя.
+// @Tags POST
+// @Summary Регистрация пользователя.
+// @Description Регистрация пользователя.
+// @Accept json
+// @Produce json
+// @Param request body v1_pd.RegisterRequest true "request"
+// @Success 200 {object} v1_pd.RegisterResponse
+// @Failure 500 "failed to register user"
+// @Router /goph_keeper_v1.SyncFromClient/Register [post]
 func (h *Handlers) Register(ctx context.Context, in *pd.RegisterRequest) (*pd.RegisterResponse, error) {
 	if in.Login == "" || in.Password == "" {
 		h.log.Error("password or login is empty")

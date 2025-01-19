@@ -1,3 +1,1 @@
-time=2025-01-19T12:17:43.221+03:00 level=ERROR msg="health.repositories.app: failed to register user"
-time=2025-01-19T12:19:47.203+03:00 level=INFO msg="Switching to AuthUser page"
-time=2025-01-19T12:21:53.131+03:00 level=INFO msg="start credentials"
+time=2025-01-19T19:34:10.117+03:00 level=ERROR msg="health.repositories.app: failed to register user"

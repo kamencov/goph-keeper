@@ -30,6 +30,14 @@ func (c *CLI) buttonsStart(ctx context.Context, app *tview.Application, pages *t
 		"1. Регистрация: Если вы впервые, то требуется пройти регистрацию\n" +
 		"2. Авторизация: Если вы уже зарегистрированы, то требуется пройти авторизацию\n"))
 
+	// Добавляем информацию о версии и дате
+	version := "Version: 1.0.0"           // Укажите версию программы
+	buildDate := "Build Date: 2025-01-19" // Укажите дату сборки
+	form.AddFormItem(tview.NewTextView().
+		SetText(version + "\n" + buildDate).
+		SetTextAlign(tview.AlignBottom).
+		SetDynamicColors(true))
+
 	return form
 }
 
@@ -52,6 +60,14 @@ func (c *CLI) buttonsOffline(ctx context.Context, app *tview.Application, pages 
 
 	form.AddFormItem(tview.NewTextView().SetText("Добро пожаловать в оффлаин режим!\n" +
 		"Данный режим только для уже зарегистрированных пользователей\n"))
+
+	// Добавляем информацию о версии и дате
+	version := "Version: 1.0.0"           // Укажите версию программы
+	buildDate := "Build Date: 2025-01-19" // Укажите дату сборки
+	form.AddFormItem(tview.NewTextView().
+		SetText(version + "\n" + buildDate).
+		SetTextAlign(tview.AlignBottom).
+		SetDynamicColors(true))
 
 	return form
 }

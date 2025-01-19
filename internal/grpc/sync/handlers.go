@@ -9,6 +9,7 @@ import (
 )
 
 // serviceCred - интерфейс сервиса Credentials.
+//
 //go:generate mockgen -source=handlers.go -destination=handlers_mock.go -package=sync
 type serviceCred interface {
 	SyncSaveCredentials(ctx context.Context, accessToken, resource, login, password string) error
@@ -58,7 +59,17 @@ func NewHandler(log *slog.Logger,
 	}
 }
 
-// SyncFromClientCredentials - синхронизирует учётные данные.
+// SyncFromClientCredentials - синхронизирует учётные данные от ресурсов.
+// @Tags POST
+// @Summary Синхронизирует учётные данные.
+// @Description Синхронизирует учётные данные. Выполняя действия, такие как сохранение или удаление, на основе указанных задач.
+// @Accept json
+// @Produce json
+// @Param request body v1_pd.SyncFromClientCredentialsRequest true "request"
+// @Success 200 {object} v1_pd.Empty
+// @Failure 500 "failed to save login and password"
+// @Failure 500 "failed to deleted"
+// @Router /goph_keeper_v1.SyncFromClient/SyncFromClientCredentials [post]
 func (h *Handler) SyncFromClientCredentials(ctx context.Context, in *v1_pd.SyncFromClientCredentialsRequest) (*v1_pd.Empty, error) {
 
 	for _, credential := range in.Task {
@@ -81,6 +92,16 @@ func (h *Handler) SyncFromClientCredentials(ctx context.Context, in *v1_pd.SyncF
 }
 
 // SyncFromClientTextData - синхронизирует текстовые данные.
+// @Tags POST
+// @Summary Синхронизирует текстовые данные.
+// @Description Синхронизирует текстовые данные. Выполняя действия, такие как сохранение или удаление, на основе указанных задач.
+// @Accept json
+// @Produce json
+// @Param request body v1_pd.SyncFromClientTextDataRequest true "request"
+// @Success 200 {object} v1_pd.Empty
+// @Failure 500 "failed to save login and password"
+// @Failure 500 "failed to deleted"
+// @Router /goph_keeper_v1.SyncFromClient/SyncFromClientTextData [post]
 func (h *Handler) SyncFromClientTextData(ctx context.Context, in *v1_pd.SyncFromClientTextDataRequest) (*v1_pd.Empty, error) {
 	for _, textData := range in.Task {
 		switch textData.Action {
@@ -101,6 +122,16 @@ func (h *Handler) SyncFromClientTextData(ctx context.Context, in *v1_pd.SyncFrom
 }
 
 // SyncFromClientBinaryData - синхронизирует бинарные данные.
+// @Tags POST
+// @Summary Синхронизирует бинарные данные.
+// @Description Синхронизирует бинарные данные. Выполняя действия, такие как сохранение или удаление, на основе указанных задач.
+// @Accept json
+// @Produce json
+// @Param request body v1_pd.SyncFromClientBinaryDataRequest true "request"
+// @Success 200 {object} v1_pd.Empty
+// @Failure 500 "failed to save login and password"
+// @Failure 500 "failed to deleted"
+// @Router /goph_keeper_v1.SyncFromClient/SyncFromClientBinaryData [post]
 func (h *Handler) SyncFromClientBinaryData(ctx context.Context, in *v1_pd.SyncFromClientBinaryDataRequest) (*v1_pd.Empty, error) {
 
 	for _, binaryData := range in.Task {
@@ -123,6 +154,16 @@ func (h *Handler) SyncFromClientBinaryData(ctx context.Context, in *v1_pd.SyncFr
 }
 
 // SyncFromClientCards - синхронизирует карты.
+// @Tags POST
+// @Summary Синхронизирует карты.
+// @Description Синхронизирует карты. Выполняя действия, такие как сохранение или удаление, на основе указанных задач.
+// @Accept json
+// @Produce json
+// @Param request body v1_pd.SyncFromClientCardsRequest true "request"
+// @Success 200 {object} v1_pd.Empty
+// @Failure 500 "failed to save login and password"
+// @Failure 500 "failed to deleted"
+// @Router /goph_keeper_v1.SyncFromClient/SyncFromClientCards [post]
 func (h *Handler) SyncFromClientCards(ctx context.Context, in *v1_pd.SyncFromClientCardsRequest) (*v1_pd.Empty, error) {
 
 	for _, card := range in.Task {

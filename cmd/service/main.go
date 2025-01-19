@@ -6,6 +6,16 @@ import (
 	"os"
 )
 
+//@title GophKeeper API
+//@version 1.0
+//@description API for GophKeeper service
+
+//@host localhost:8081
+//@BasePath /api/v1
+
+// @securityDefinitions.apiKey ApiKeyAuth
+// @in header
+// @name Authorization
 const (
 	envLocal = "local"
 	envProd  = "prod"

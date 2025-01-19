@@ -11,6 +11,7 @@ import (
 )
 
 // serviceAuth - интерфейс на сервисный слой.
+//
 //go:generate mockgen -source=handlers.go -destination=handlers_mock.go -package=auth
 type serviceAuth interface {
 	Auth(login, password string) (auth.Tokens, error)
@@ -32,6 +33,18 @@ func NewHandlers(log *slog.Logger, service serviceAuth) *Handlers {
 }
 
 // Auth - авторизует пользователя.
+// @Tags POST
+// @Summary Авторизует пользователя.
+// @Description Авторизует пользователя.
+// @Accept json
+// @Produce json
+// @Param request body v1_pd.AuthRequest true "request"
+// @Success 200 {object} v1_pd.AuthResponse
+// @Failure 400 "password or login is empty"
+// @Failure 404 "login is not correct"
+// @Failure 401 "password is not correct"
+// @Failure 500 "failed to auth user"
+// @Router /goph_keeper_v1.Auth/Auth [post]
 func (h *Handlers) Auth(ctx context.Context, in *pd.AuthRequest) (*pd.AuthResponse, error) {
 	if in.Password == "" || in.Login == "" {
 		h.log.Error("password or login is empty")

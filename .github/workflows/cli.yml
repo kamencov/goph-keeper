@@ -26,7 +26,7 @@ jobs:
       - name: Run tests with coverage
         run: |
           go test -coverprofile=coverage.out ./...
-          grep -vE "(./cli/|mock.go|./proto/|./internal/migrations/|run.go)" coverage.out > coverage.filtered.out
+          grep -vE "(./cli/|mock.go|./proto/|./internal/migrations/|run.go|./docs/)" coverage.out > coverage.filtered.out
           go tool cover -func=coverage.filtered.out
 
       - name: Upload coverage reports to Codecov
