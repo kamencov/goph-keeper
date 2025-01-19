@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package goph_keeper_v1;
+
+option go_package = "goph-keeper/internal/proto/v1:pd";
+
+message RegisterRequest {
+  string login = 1;
+  string password = 2;
+}
+
+message RegisterResponse {
+  int32 uid = 1;
+  string message = 2;
+}
+
+message AuthRequest {
+  string login = 1;
+  string password = 2;
+}
+
+message AuthResponse {
+  string token = 1;
+  string message = 2;
+}
+
+message PostLoginAndPasswordRequest {
+  string resource = 1;
+  string login = 2;
+  string password = 3;
+}
+
+message PostTextDataRequest {
+  reserved 1;
+  string data = 2;
+}
+
+message PostBinaryDataRequest {
+  reserved 1;
+  bytes data = 2;
+}
+
+message PostCardsRequest {
+  reserved 1;
+  string data = 2;
+}
+
+message Empty {
+  string message = 1;
+}
+
+service Register {
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+}
+
+service Auth {
+  rpc Auth(AuthRequest) returns (AuthResponse);
+}
+
+service PostCredentials {
+  rpc PostLoginAndPassword(PostLoginAndPasswordRequest) returns (Empty);
+}
+
+service PostTextData{
+  rpc PostTextData(PostTextDataRequest) returns (Empty);
+}
+
+service PostBinaryData{
+  rpc PostBinaryData(PostTextDataRequest) returns (Empty);
+}
+
+service PostCards{
+  rpc PostCards(PostTextDataRequest) returns (Empty);
+}
