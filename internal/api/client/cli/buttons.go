@@ -5,6 +5,7 @@ import (
 	"github.com/rivo/tview"
 )
 
+// buttonsStart - основная форма online.
 func (c *CLI) buttonsStart(ctx context.Context, app *tview.Application, pages *tview.Pages) *tview.Form {
 	form := tview.NewForm()
 	form.
@@ -32,6 +33,7 @@ func (c *CLI) buttonsStart(ctx context.Context, app *tview.Application, pages *t
 	return form
 }
 
+// buttonsOffline - основная форма offline.
 func (c *CLI) buttonsOffline(ctx context.Context, app *tview.Application, pages *tview.Pages) *tview.Form {
 	form := tview.NewForm()
 	form.
@@ -54,6 +56,7 @@ func (c *CLI) buttonsOffline(ctx context.Context, app *tview.Application, pages 
 	return form
 }
 
+// buttonsData - основная форма для работы с данными.
 func (c *CLI) buttonsData(ctx context.Context, app *tview.Application, pages *tview.Pages) *tview.Form {
 	form := tview.NewForm()
 	form.

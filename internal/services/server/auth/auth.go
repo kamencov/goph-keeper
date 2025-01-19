@@ -7,10 +7,12 @@ import (
 	"time"
 )
 
+// Tokens - структура для хранения токенов.
 type Tokens struct {
 	AccessToken string
 }
 
+// AccessTokenClaims - структура для хранения данных в accessToken.
 type AccessTokenClaims struct {
 	Login string
 	jwt.RegisteredClaims

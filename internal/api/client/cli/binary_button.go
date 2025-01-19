@@ -5,10 +5,12 @@ import (
 	"github.com/rivo/tview"
 )
 
+// BinaryDataCLI - Структура для хранения данных.
 type BinaryDataCLI struct {
 	Data string
 }
 
+// binaryButton - Основная форма для ввода данных.
 func (c *CLI) binaryButton(ctx context.Context, app *tview.Application, pages *tview.Pages) *tview.Form {
 	var binaryData BinaryDataCLI
 	form := tview.NewForm()
@@ -30,6 +32,7 @@ func (c *CLI) binaryButton(ctx context.Context, app *tview.Application, pages *t
 
 }
 
+// saveBinaryData - Показываем подтверждение сохранения.
 func (c *CLI) saveBinaryData(ctx context.Context, app *tview.Application, pages *tview.Pages, form *tview.Form, binaryData *BinaryDataCLI) {
 	model := tview.NewModal()
 	model.SetText("Вы хотите сохранить данные?\n" +
@@ -57,7 +60,7 @@ func (c *CLI) saveBinaryData(ctx context.Context, app *tview.Application, pages 
 	pages.AddPage("SaveConfirmation", model, true, true)
 }
 
-// Сбрасывает данные в форме и структуре
+// clearFormBinary - Сбрасывает данные в форме и структуре.
 func clearFormBinary(form *tview.Form, binaryData *BinaryDataCLI) {
 	binaryData.Data = ""
 

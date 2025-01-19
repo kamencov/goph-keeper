@@ -85,7 +85,7 @@ func RunClient() error {
 	defer cancel()
 
 	//Инициализация воркера
-	newWorker := workers.NewWorker(newServiceWorker, conn)
+	newWorker := workers.NewWorker(log, newServiceWorker, conn)
 
 	go newWorker.Run(ctx)
 

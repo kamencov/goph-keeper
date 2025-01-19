@@ -5,10 +5,12 @@ import (
 	"github.com/rivo/tview"
 )
 
+// TextData - структура для хранения текста.
 type TextData struct {
 	Text string
 }
 
+// textButton - функция, которая создает и возвращает форму для ввода текста.
 func (c *CLI) textButton(ctx context.Context, app *tview.Application, pages *tview.Pages) *tview.Form {
 	var textData TextData
 	form := tview.NewForm()
@@ -29,7 +31,7 @@ func (c *CLI) textButton(ctx context.Context, app *tview.Application, pages *tvi
 	return form
 }
 
-// Модальное окно подтверждения сохранения
+// saveTextData - Модальное окно подтверждения сохранения.
 func (c *CLI) saveTextData(ctx context.Context, app *tview.Application, pages *tview.Pages, form *tview.Form, textData *TextData) {
 	modal := tview.NewModal().
 		SetText("Вы хотите сохранить данные?\n" +
@@ -58,7 +60,7 @@ func (c *CLI) saveTextData(ctx context.Context, app *tview.Application, pages *t
 	pages.AddPage("SaveConfirmation", modal, true, true)
 }
 
-// Сбрасывает данные в форме и структуре
+// clearFormTextData - Сбрасывает данные в форме и структуре.
 func clearFormTextData(form *tview.Form, textData *TextData) {
 	textData.Text = ""
 

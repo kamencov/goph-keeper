@@ -6,6 +6,7 @@ import (
 )
 
 // storageCards - интерфейс storage для сервиса Cards.
+//go:generate mockgen -source=service.go -destination=service_mock.go -package cards
 type storageCards interface {
 	GetUserIDByToken(ctx context.Context, accessToken string) (int, error)
 	SaveCards(ctx context.Context, userID int, cards string) error
@@ -26,11 +27,7 @@ func NewServiceCards(log *slog.Logger, storage storageCards) *ServiceCards {
 	}
 }
 
-// SaveCards - отрабатывает полученные данные в слой storage.
-func (s *ServiceCards) SaveCards(ctx context.Context, userID int, cards string) error {
-	return s.storage.SaveCards(ctx, userID, cards)
-}
-
+// SyncSaveCards - сохраняет полученные данные.
 func (s *ServiceCards) SyncSaveCards(ctx context.Context, accessToken, cards string) error {
 	userID, err := s.storage.GetUserIDByToken(ctx, accessToken)
 	if err != nil {
@@ -46,6 +43,7 @@ func (s *ServiceCards) SyncSaveCards(ctx context.Context, accessToken, cards str
 	return nil
 }
 
+// SyncDelBinary - удаляет полученные данные.
 func (s *ServiceCards) SyncDelBinary(ctx context.Context, accessToken, data string) error {
 	userID, err := s.storage.GetUserIDByToken(ctx, accessToken)
 	if err != nil {

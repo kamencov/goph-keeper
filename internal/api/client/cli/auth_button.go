@@ -6,11 +6,13 @@ import (
 	"github.com/rivo/tview"
 )
 
+// Register - структура для регистрации пользователя.
 type Register struct {
 	Login    string
 	Password string
 }
 
+// register - функция для регистрации пользователя.
 func (c *CLI) register(ctx context.Context, app *tview.Application, pages *tview.Pages) *tview.Form {
 
 	var reg Register
@@ -43,6 +45,7 @@ func (c *CLI) register(ctx context.Context, app *tview.Application, pages *tview
 	return form
 }
 
+// registerAPI - функция для регистрации пользователя.
 func (c *CLI) registerAPI(ctx context.Context, reg Register) bool {
 	err := c.auth.RegisterUser(ctx, c.conn, reg.Login, reg.Password)
 
@@ -53,6 +56,7 @@ func (c *CLI) registerAPI(ctx context.Context, reg Register) bool {
 	return true
 }
 
+// authUser - функция для авторизации пользователя.
 func (c *CLI) authUser(ctx context.Context, app *tview.Application, pages *tview.Pages) *tview.Form {
 
 	var reg Register
@@ -82,6 +86,7 @@ func (c *CLI) authUser(ctx context.Context, app *tview.Application, pages *tview
 	return form
 }
 
+// authUserOffline - функция для авторизации пользователя.
 func (c *CLI) authUserOffline(ctx context.Context, app *tview.Application, pages *tview.Pages) *tview.Form {
 
 	var reg Register

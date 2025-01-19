@@ -6,13 +6,14 @@ import (
 	"log/slog"
 )
 
+// Resource - Структура для хранения данных.
 type Resource struct {
 	Resource string
 	Login    string
 	Password string
 }
 
-// Основная форма для ввода данных
+// credentials - Функция для отображения формы для ввода данных.
 func (c *CLI) credentials(ctx context.Context, app *tview.Application, pages *tview.Pages) *tview.Form {
 	const op = "cli.credentials"
 	c.log.With(slog.String("op", op))
@@ -46,7 +47,7 @@ func (c *CLI) credentials(ctx context.Context, app *tview.Application, pages *tv
 	return form
 }
 
-// Модальное окно подтверждения сохранения
+// saveResource - Модальное окно подтверждения сохранения.
 func (c *CLI) saveResource(
 	ctx context.Context,
 	app *tview.Application,
@@ -87,7 +88,7 @@ func (c *CLI) saveResource(
 	pages.AddPage("SaveConfirmation", modal, true, true)
 }
 
-// Сбрасывает данные в форме и структуре
+// clearFormResource - Сбрасывает данные в форме и структуре.
 func clearFormResource(form *tview.Form, resource *Resource) {
 	resource.Resource = ""
 	resource.Login = ""

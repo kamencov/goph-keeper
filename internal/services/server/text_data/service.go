@@ -5,27 +5,29 @@ import (
 	"log/slog"
 )
 
+// storageTextData - интерфейс сервиса text_data.
+//
+//go:generate mockgen -source=service.go -destination=service_mock.go -package text_data
 type storageTextData interface {
 	GetUserIDByToken(ctx context.Context, accessToken string) (int, error)
 	SaveTextDataPstgres(ctx context.Context, userID int, data string) error
 	DeletedText(ctx context.Context, userID int, data string) error
 }
 
+// Service - сервис text_data.
 type Service struct {
 	log     *slog.Logger
 	storage storageTextData
 }
 
+// NewService - конструктор.
 func NewService(log *slog.Logger, storage storageTextData) *Service {
 	return &Service{
 		log:     log,
 		storage: storage}
 }
 
-func (s *Service) SaveTextData(ctx context.Context, userID int, data string) error {
-	return s.storage.SaveTextDataPstgres(ctx, userID, data)
-}
-
+// SyncSaveText - сохраняет текстовые данные.
 func (s *Service) SyncSaveText(ctx context.Context, accessToken, data string) error {
 	userID, err := s.storage.GetUserIDByToken(ctx, accessToken)
 	if err != nil {
@@ -41,6 +43,7 @@ func (s *Service) SyncSaveText(ctx context.Context, accessToken, data string) er
 	return nil
 }
 
+// SyncDelText - удаляет текстовые данные.
 func (s *Service) SyncDelText(ctx context.Context, accessToken, data string) error {
 	userID, err := s.storage.GetUserIDByToken(ctx, accessToken)
 	if err != nil {

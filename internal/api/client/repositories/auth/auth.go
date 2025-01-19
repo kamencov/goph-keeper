@@ -7,6 +7,8 @@ import (
 	"log/slog"
 )
 
+// service - интерфейс на сервисный слой
+//go:generate mockgen -source=auth.go -destination=auth_mock.go -package=auth
 type service interface {
 	SaveTokenInBase(ctx context.Context, login, password, token string) error
 	CheckUser(ctx context.Context, login, password string) (string, error)
@@ -15,11 +17,13 @@ type service interface {
 // SignalAuth - сигнал об авторизации
 var SignalAuth = make(chan bool)
 
+// Handlers - обработчик запросов
 type Handlers struct {
 	log     *slog.Logger
 	service service
 }
 
+// NewHandlers - конструктор обработчика
 func NewHandlers(log *slog.Logger, service service) *Handlers {
 	return &Handlers{
 		log:     log,
@@ -27,6 +31,7 @@ func NewHandlers(log *slog.Logger, service service) *Handlers {
 	}
 }
 
+// RegisterUser - регистрирует пользователя
 func (h *Handlers) RegisterUser(ctx context.Context, conn *grpc.ClientConn, login, password string) error {
 	// создаем клиента для регистрации
 	registerClient := v1_pd.NewRegisterClient(conn)
@@ -43,6 +48,7 @@ func (h *Handlers) RegisterUser(ctx context.Context, conn *grpc.ClientConn, logi
 	return nil
 }
 
+// AuthUser - авторизует пользователя
 func (h *Handlers) AuthUser(ctx context.Context, conn *grpc.ClientConn, login, password string) (string, error) {
 	// создаем клиента для авторизации
 	authClient := v1_pd.NewAuthClient(conn)

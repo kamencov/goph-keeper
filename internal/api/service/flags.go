@@ -7,6 +7,7 @@ import (
 	"os"
 )
 
+// Flags - структура флагов.
 type Flags struct {
 	log          *slog.Logger
 	AddrGRPC     string
@@ -14,21 +15,25 @@ type Flags struct {
 	PasswordSalt []byte
 }
 
+// NewFlags - конструктор флагов.
 func NewFlags(log *slog.Logger) *Flags {
 	return &Flags{
 		log: log,
 	}
 }
 
+// Parse - парсим флаги.
 func (f *Flags) Parse() {
 	f.parsFlags()
 	f.initSaltFromEnv()
 }
 
+// parsFlags - парсим флаги.
 func (f *Flags) parsFlags() {
 	flag.StringVar(&f.AddrGRPC, "addr", ":8081", "gRPC address")
 }
 
+// initSaltFromEnv - инициализация соли.
 func (f *Flags) initSaltFromEnv() {
 	err := godotenv.Load("/Users/pavel/GolandProjects/goph-keeper/.env")
 	if err != nil {

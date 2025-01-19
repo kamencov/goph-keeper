@@ -11,14 +11,17 @@ import (
 	"log/slog"
 )
 
+// getService - интерфейс на сервисный слой.
 type getService interface {
 	GetAllData(ctx context.Context, token, tableName string) (*sql.Rows, error)
 }
 
+// deletedService - интерфейс на сервисный слой.
 type deletedService interface {
 	DeletedData(ctx context.Context, token, tableName string, id int) error
 }
 
+// CLI - структура.
 type CLI struct {
 	log         *slog.Logger
 	auth        *auth.Handlers
@@ -30,6 +33,7 @@ type CLI struct {
 	token       string
 }
 
+// NewCLI - конструктор.
 func NewCLI(log *slog.Logger,
 	auth *auth.Handlers,
 	save *handlers.Handler,
@@ -48,6 +52,7 @@ func NewCLI(log *slog.Logger,
 	}
 }
 
+// RunCLI - запуск приложения.
 func (c *CLI) RunCLI(ctx context.Context) {
 	app := tview.NewApplication()
 	pages := tview.NewPages()

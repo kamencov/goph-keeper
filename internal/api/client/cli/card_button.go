@@ -5,10 +5,12 @@ import (
 	"github.com/rivo/tview"
 )
 
+// CardData - структура для хранения данных карты.
 type CardData struct {
 	Data string
 }
 
+// cardButton - возвращает форму для ввода данных карты.
 func (c *CLI) cardButton(ctx context.Context, app *tview.Application, pages *tview.Pages) *tview.Form {
 	var cardData CardData
 	form := tview.NewForm()
@@ -36,6 +38,7 @@ func (c *CLI) cardButton(ctx context.Context, app *tview.Application, pages *tvi
 	return form
 }
 
+// saveCardData - сохраняет данные карты.
 func (c *CLI) saveCardData(ctx context.Context, app *tview.Application, pages *tview.Pages, form *tview.Form, cardData *CardData) {
 	model := tview.NewModal()
 	model.SetText("Вы хотите сохранить данные?\n" +
@@ -64,7 +67,7 @@ func (c *CLI) saveCardData(ctx context.Context, app *tview.Application, pages *t
 	pages.AddPage("SaveConfirmation", model, true, true)
 }
 
-// Сбрасывает данные в форме и структуре
+// clearFormCard - Сбрасывает данные в форме и структуре.
 func clearFormCard(form *tview.Form, cardData *CardData) {
 	cardData.Data = ""
 

@@ -10,20 +10,25 @@ import (
 	"time"
 )
 
+// contextKey - ключ для хранения userID в контексте.
 type contextKey string
 
 const UserIDContextKey contextKey = "userID"
 
+// service - интерфейс на сервисный слой.
+//
+//go:generate mockgen -source=auth.go -destination=auth_mock.go -package=auth
 type service interface {
 	ValidateToken(ctx context.Context, token string) (int, error)
-	CreatTokenForUser(userID string) (string, error)
 }
 
+// Middleware - структура Middleware.
 type Middleware struct {
 	log     *slog.Logger
 	service service
 }
 
+// NewMiddleware - конструктор Middleware.
 func NewMiddleware(log *slog.Logger, service service) *Middleware {
 	return &Middleware{
 		log:     log,
@@ -31,6 +36,7 @@ func NewMiddleware(log *slog.Logger, service service) *Middleware {
 	}
 }
 
+// UnaryInterceptor - обработчик Unary-запросов.
 func (m *Middleware) UnaryInterceptor(ctx context.Context,
 	req any,
 	info *grpc.UnaryServerInfo,
@@ -91,19 +97,20 @@ func (m *Middleware) UnaryInterceptor(ctx context.Context,
 	return resp, nil
 }
 
+// AuthCheckInterceptor - обработчик аутентификации.
 func (m *Middleware) AuthCheckInterceptor(ctx context.Context) (context.Context, error) {
+	// Извлекаем метаданные из контекста
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return nil, status.Errorf(codes.Unauthenticated, "metadata is not provided")
+		md = metadata.New(nil) // Инициализируем пустые метаданные, если их нет
 	}
 
-	tokens := md["authorization"]
-	if len(tokens) == 0 {
-		return nil, status.Errorf(codes.Unauthenticated, "authorization token is not provided")
+	var accessToken string
+	if authHeader, exists := md["authorization"]; exists && len(authHeader) > 0 {
+		accessToken = authHeader[0]
 	}
 
-	token := tokens[0]
-	userID, err := m.service.ValidateToken(ctx, token) // Ваша логика проверки токена
+	userID, err := m.service.ValidateToken(ctx, accessToken) // Ваша логика проверки токена
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
 	}

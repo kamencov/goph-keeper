@@ -6,6 +6,9 @@ import (
 	"log/slog"
 )
 
+
+// storage - интерфейс для работы с базой данных.
+//go:generate mockgen -source=service.go -destination=service_mock.go -package=get_and_deleted_data
 type storage interface {
 	SaveSync(ctx context.Context, tableName string, userID int, taskID int, action string) error
 	GetAll(ctx context.Context, userID int, tableName string) (*sql.Rows, error)
@@ -13,11 +16,13 @@ type storage interface {
 	Deleted(ctx context.Context, tableName string, id int) error
 }
 
+// GetAll - структура для работы с получением всех данных и удалением.
 type GetAll struct {
 	log *slog.Logger
 	DB  storage
 }
 
+// NewService - конструктор.
 func NewService(log *slog.Logger, db storage) *GetAll {
 	return &GetAll{
 		log: log,
@@ -25,6 +30,7 @@ func NewService(log *slog.Logger, db storage) *GetAll {
 	}
 }
 
+// GetAllData - возвращает все данные из базы данных.
 func (s *GetAll) GetAllData(ctx context.Context, token, tableName string) (*sql.Rows, error) {
 	userID, err := s.DB.GetUserIDWithToken(ctx, token)
 	if err != nil {
@@ -35,6 +41,7 @@ func (s *GetAll) GetAllData(ctx context.Context, token, tableName string) (*sql.
 	return s.DB.GetAll(ctx, userID, tableName)
 }
 
+// DeletedData - удаляет данные из базы данных.
 func (s *GetAll) DeletedData(ctx context.Context, token, tableName string, id int) error {
 	userID, err := s.DB.GetUserIDWithToken(ctx, token)
 	if err != nil {

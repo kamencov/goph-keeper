@@ -15,11 +15,13 @@ var (
 	ErrUserAlreadyExists = errors.New("the user already exists")
 )
 
+// Storage - хранилище данных.
 type Storage struct {
 	storage *sql.DB
 	log     *slog.Logger
 }
 
+// NewSqlStorage - создает новое подключение к базе данных.
 func NewSqlStorage(log *slog.Logger) (*Storage, error) {
 	db := &Storage{
 		log: log,
@@ -28,13 +30,13 @@ func NewSqlStorage(log *slog.Logger) (*Storage, error) {
 	// Получаем путь для базы данных
 	dbPath, err := db.getDatabaseFilePath()
 	if err != nil {
-		log.Error("Ошибка определения пути базы данных", err)
+		log.Error("Ошибка определения пути базы данных", "error", err)
 		return nil, err
 	}
 
 	// Создаём базу данных
 	if err := db.init(dbPath); err != nil {
-		log.Error("Ошибка создания базы данных", err)
+		log.Error("Ошибка создания базы данных", "error", err)
 		return nil, err
 	}
 

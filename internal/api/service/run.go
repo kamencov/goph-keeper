@@ -4,12 +4,9 @@ import (
 	"google.golang.org/grpc"
 	_ "google.golang.org/grpc/encoding/gzip"
 	handlerAuth "goph-keeper/internal/grpc/auth"
-	handlerBinaryData "goph-keeper/internal/grpc/binary_data"
-	handlerCards "goph-keeper/internal/grpc/cards"
 	"goph-keeper/internal/grpc/health"
 	handlerRegister "goph-keeper/internal/grpc/register"
 	"goph-keeper/internal/grpc/sync"
-	handlerTextData "goph-keeper/internal/grpc/text_data"
 	"goph-keeper/internal/middleware/auth"
 	pd "goph-keeper/internal/proto/v1"
 	serviceAuth "goph-keeper/internal/services/server/auth"
@@ -68,10 +65,6 @@ func Run(log *slog.Logger) error {
 	// Создаем grpc
 	registerUser := handlerRegister.NewHandlers(log, newServiceAuth)
 	authUser := handlerAuth.NewHandlers(log, newServiceAuth)
-	//postCredentials := handlerCredentials.NewHandlers(log, newServiceCredentials)
-	postTextData := handlerTextData.NewHandlers(log, newServiceTextData)
-	postBinaryData := handlerBinaryData.NewHandlers(log, newServiceBinaryData)
-	postCards := handlerCards.NewHandlers(log, newServiceCards)
 	healthStatus := health.NewHandler(log)
 	newSync := sync.NewHandler(log, newServiceCredentials, newServiceTextData, newServiceBinaryData, newServiceCards)
 
@@ -81,10 +74,6 @@ func Run(log *slog.Logger) error {
 	// Регистрируем goph-keeper в GRPC-сервере
 	pd.RegisterRegisterServer(grpcServer, registerUser)
 	pd.RegisterAuthServer(grpcServer, authUser)
-	//pd.RegisterPostCredentialsServer(grpcServer, postCredentials)
-	pd.RegisterPostTextDataServer(grpcServer, postTextData)
-	pd.RegisterPostBinaryDataServer(grpcServer, postBinaryData)
-	pd.RegisterPostCardsServer(grpcServer, postCards)
 	pd.RegisterHealthServer(grpcServer, healthStatus)
 	pd.RegisterSyncFromClientServer(grpcServer, newSync)
 

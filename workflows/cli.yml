@@ -1,0 +1,37 @@
+name: Go CI
+
+on:
+  push:
+    branches: [ iter3 ]
+  pull_request:
+    branches: [ iter3 ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.22.3'  # Укажите вашу версию Go
+
+      - name: Install dependencies
+        run: go mod tidy
+
+
+      - name: Run tests with coverage
+        run: |
+          go test -coverprofile=coverage.out ./...
+          grep -vE "(./cli/|mock.go|./proto/)" coverage.out > coverage.filtered.out
+          go tool cover -func=coverage.filtered.out
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          file: coverage.filtered.out
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: kamencov/goph-keeper

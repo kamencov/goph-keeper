@@ -1,137 +1,3 @@
-//package sync_client
-//
-//import (
-//	"context"
-//	"google.golang.org/grpc"
-//	v1_pd "goph-keeper/internal/proto/v1"
-//	"goph-keeper/internal/services/workers"
-//	"log/slog"
-//	"time"
-//)
-//
-//type Handler struct {
-//	log *slog.Logger
-//}
-//
-//func NewHandlers(log *slog.Logger) *Handler {
-//	return &Handler{
-//		log: log,
-//	}
-//}
-//
-//func (h *Handler) SyncSaveCredentials(ctx context.Context, conn *grpc.ClientConn, data []*workers.Credentials) error {
-//	// создаем клиента для регистрации
-//	regClient := v1_pd.NewSyncFromClientClient(conn)
-//
-//	// Преобразуем `workers.Credentials` в `v1_pd.Credentials`
-//	var task []*v1_pd.Credentials
-//	for _, cred := range data {
-//		task = append(task, &v1_pd.Credentials{
-//			Id:          int32(cred.ID),
-//			IdUser:      int32(cred.UserID),
-//			Resource:    cred.Resource,
-//			Login:       cred.Login,
-//			Password:    cred.Password,
-//			UpdatedAt:   cred.UpdatedAt.Format(time.RFC3339),
-//			Action:      cred.Action,
-//			AccessToken: cred.AccessToken,
-//		})
-//	}
-//
-//	req := &v1_pd.SyncFromClientCredentialsRequest{Task: task}
-//
-//	// записываем токент в контекст
-//	ctx = context.WithValue(ctx, "authorization", task[0].AccessToken)
-//
-//	_, err := regClient.SyncFromClientCredentials(ctx, req)
-//	if err != nil {
-//		h.log.Error("failed to sync credentials", "error", err)
-//		return err
-//	}
-//	return nil
-//}
-//
-//func (h *Handler) SyncTextData(ctx context.Context, conn *grpc.ClientConn, data []*workers.TextData) error {
-//	// создаем клиента для регистрации
-//	regClient := v1_pd.NewSyncFromClientClient(conn)
-//
-//	// Преобразуем `workers.TextData` в `v1_pd.TextData`
-//	var task []*v1_pd.TextData
-//	for _, cred := range data {
-//		task = append(task, &v1_pd.TextData{
-//			Id:        int32(cred.ID),
-//			IdUser:    int32(cred.UserID),
-//			Text:      cred.Text,
-//			UpdatedAt: cred.UpdatedAt.Format(time.RFC3339),
-//			Action:    cred.Action,
-//		})
-//	}
-//
-//	req := &v1_pd.SyncFromClientTextDataRequest{Task: task}
-//
-//	_, err := regClient.SyncFromClientTextData(ctx, req)
-//	if err != nil {
-//		h.log.Error("failed to sync text data", "error", err)
-//		return err
-//	}
-//
-//	return nil
-//}
-//
-//func (h *Handler) SyncBinaryData(ctx context.Context, conn *grpc.ClientConn, data []*workers.BinaryData) error {
-//	// создаем клиента для регистрации
-//	regClient := v1_pd.NewSyncFromClientClient(conn)
-//
-//	// Преобразуем `workers.BinaryData` в `v1_pd.BinaryData`
-//	var task []*v1_pd.BinaryData
-//	for _, cred := range data {
-//		task = append(task, &v1_pd.BinaryData{
-//			Id:        int32(cred.ID),
-//			IdUser:    int32(cred.UserID),
-//			Binary:    cred.Binary,
-//			UpdatedAt: cred.UpdatedAt.Format(time.RFC3339),
-//			Action:    cred.Action,
-//		})
-//	}
-//
-//	req := &v1_pd.SyncFromClientBinaryDataRequest{Task: task}
-//
-//	_, err := regClient.SyncFromClientBinaryData(ctx, req)
-//	if err != nil {
-//		h.log.Error("failed to sync binary data", "error", err)
-//		return err
-//	}
-//
-//	return nil
-//}
-//
-//func (h *Handler) SyncSaveCards(ctx context.Context, conn *grpc.ClientConn, data []*workers.Cards) error {
-//	// создаем клиента для регистрации
-//	regClient := v1_pd.NewSyncFromClientClient(conn)
-//
-//	// Преобразуем `workers.Cards` в `v1_pd.Cards`
-//	var task []*v1_pd.Cards
-//	for _, cred := range data {
-//		task = append(task, &v1_pd.Cards{
-//			Id:        int32(cred.ID),
-//			IdUser:    int32(cred.UserID),
-//			Cards:     cred.Cards,
-//			UpdatedAt: cred.UpdatedAt.Format(time.RFC3339),
-//			Action:    cred.Action,
-//		})
-//	}
-//
-//	req := &v1_pd.SyncFromClientCardsRequest{Task: task}
-//
-//	_, err := regClient.SyncFromClientCards(ctx, req)
-//	if err != nil {
-//		h.log.Error("failed to sync cards", "error", err)
-//		return err
-//	}
-//
-//	return nil
-//}
-
 package sync_client
 
 import (
@@ -145,18 +11,19 @@ import (
 	"time"
 )
 
+// Handler - интерфейс на сервисный слой.
 type Handler struct {
 	log *slog.Logger
 }
 
-// NewHandlers создаёт новый Handler
+// NewHandlers - создаёт новый Handler.
 func NewHandlers(log *slog.Logger) *Handler {
 	return &Handler{
 		log: log,
 	}
 }
 
-// ключ для контекста авторизации
+// contextKey - ключ для контекста авторизации.
 type contextKey string
 
 const authorizationKey contextKey = "authorization"
@@ -168,7 +35,7 @@ var (
 	errorNoCards       = errors.New("no cards to sync")
 )
 
-// SyncSaveCredentials синхронизирует учётные данные
+// SyncCredentials синхронизирует учётные данные.
 func (h *Handler) SyncCredentials(ctx context.Context, conn *grpc.ClientConn, data []*workers.Credentials) error {
 	regClient := v1_pd.NewSyncFromClientClient(conn)
 
@@ -206,7 +73,7 @@ func (h *Handler) SyncCredentials(ctx context.Context, conn *grpc.ClientConn, da
 	return nil
 }
 
-// SyncTextData синхронизирует текстовые данные
+// SyncTextData синхронизирует текстовые данные.
 func (h *Handler) SyncTextData(ctx context.Context, conn *grpc.ClientConn, data []*workers.TextData) error {
 	regClient := v1_pd.NewSyncFromClientClient(conn)
 
@@ -241,7 +108,7 @@ func (h *Handler) SyncTextData(ctx context.Context, conn *grpc.ClientConn, data 
 	return nil
 }
 
-// SyncBinaryData синхронизирует бинарные данные
+// SyncBinaryData синхронизирует бинарные данные.
 func (h *Handler) SyncBinaryData(ctx context.Context, conn *grpc.ClientConn, data []*workers.BinaryData) error {
 	regClient := v1_pd.NewSyncFromClientClient(conn)
 
@@ -276,7 +143,7 @@ func (h *Handler) SyncBinaryData(ctx context.Context, conn *grpc.ClientConn, dat
 	return nil
 }
 
-// SyncCards синхронизирует карты
+// SyncCards синхронизирует карты.
 func (h *Handler) SyncCards(ctx context.Context, conn *grpc.ClientConn, data []*workers.Cards) error {
 	regClient := v1_pd.NewSyncFromClientClient(conn)
 

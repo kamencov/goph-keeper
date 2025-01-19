@@ -5,28 +5,32 @@ import (
 	"log/slog"
 )
 
+
+// storage - интерфейс сервиса.
+//go:generate mockgen -source=service.go -destination=service_mock.go -package binary_data
 type storage interface {
 	GetUserIDByToken(ctx context.Context, accessToken string) (int, error)
 	SaveBinaryDataBinary(ctx context.Context, uid int, data string) error
 	DeletedBinary(ctx context.Context, userID int, data string) error
 }
 
+
+// Service - сервис для работы с данными.
 type Service struct {
 	log     *slog.Logger
 	storage storage
 }
 
+
+// NewService - конструктор.
 func NewService(log *slog.Logger, storage storage) *Service {
 	return &Service{
 		log:     log,
 		storage: storage}
 }
 
-func (s *Service) SaveBinaryData(ctx context.Context, userID int, data string) error {
 
-	return s.storage.SaveBinaryDataBinary(ctx, userID, data)
-}
-
+// SyncSaveBinary - сохраняет полученные данные.
 func (s *Service) SyncSaveBinary(ctx context.Context, accessToken, data string) error {
 	userID, err := s.storage.GetUserIDByToken(ctx, accessToken)
 	if err != nil {
@@ -42,6 +46,8 @@ func (s *Service) SyncSaveBinary(ctx context.Context, accessToken, data string) 
 	return nil
 }
 
+
+// SyncDelBinary - удаляет полученные данные.
 func (s *Service) SyncDelBinary(ctx context.Context, accessToken, data string) error {
 	userID, err := s.storage.GetUserIDByToken(ctx, accessToken)
 	if err != nil {

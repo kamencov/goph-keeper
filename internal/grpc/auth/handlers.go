@@ -10,16 +10,20 @@ import (
 	"log/slog"
 )
 
+// serviceAuth - интерфейс на сервисный слой.
+//go:generate mockgen -source=handlers.go -destination=handlers_mock.go -package=auth
 type serviceAuth interface {
 	Auth(login, password string) (auth.Tokens, error)
 }
 
+// Handlers - обработчик запросов.
 type Handlers struct {
 	pd.UnimplementedAuthServer
 	log     *slog.Logger
 	service serviceAuth
 }
 
+// NewHandlers создаёт новый Handlers.
 func NewHandlers(log *slog.Logger, service serviceAuth) *Handlers {
 	return &Handlers{
 		log:     log,
@@ -27,6 +31,7 @@ func NewHandlers(log *slog.Logger, service serviceAuth) *Handlers {
 	}
 }
 
+// Auth - авторизует пользователя.
 func (h *Handlers) Auth(ctx context.Context, in *pd.AuthRequest) (*pd.AuthResponse, error) {
 	if in.Password == "" || in.Login == "" {
 		h.log.Error("password or login is empty")

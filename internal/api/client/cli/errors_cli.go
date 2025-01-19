@@ -5,6 +5,7 @@ import (
 	"github.com/rivo/tview"
 )
 
+// errorsRegister - вывод ошибки при регистрации.
 func (c *CLI) errorsRegister(ctx context.Context, app *tview.Application, pages *tview.Pages) {
 
 	model := tview.NewModal()
@@ -26,6 +27,7 @@ func (c *CLI) errorsRegister(ctx context.Context, app *tview.Application, pages 
 	pages.AddPage("ErrorsRegister", model, true, true)
 }
 
+// errorsAuth - вывод ошибки при авторизации.
 func (c *CLI) errorsAuth(ctx context.Context, app *tview.Application, pages *tview.Pages) {
 	model := tview.NewModal()
 	model.SetText("Что-то пошло не так\n" +
@@ -46,6 +48,7 @@ func (c *CLI) errorsAuth(ctx context.Context, app *tview.Application, pages *tvi
 	pages.AddPage("ErrorsAuth", model, true, true)
 }
 
+// errorsAuthOffLine - вывод ошибки при авторизации.
 func (c *CLI) errorsAuthOffLine(ctx context.Context, app *tview.Application, pages *tview.Pages) {
 	model := tview.NewModal()
 	model.SetText("Что-то пошло не так\n" +
@@ -66,6 +69,7 @@ func (c *CLI) errorsAuthOffLine(ctx context.Context, app *tview.Application, pag
 	pages.AddPage("ErrorsAuthOffLine", model, true, true)
 }
 
+// errorsSaveCredentials - вывод ошибки при сохранении данных.
 func (c *CLI) errorsSaveCredentials(ctx context.Context, app *tview.Application, pages *tview.Pages) {
 	model := tview.NewModal()
 	model.SetText("Что-то пошло не так\n" +
@@ -86,6 +90,7 @@ func (c *CLI) errorsSaveCredentials(ctx context.Context, app *tview.Application,
 	pages.AddPage("ErrorsSaveCredentials", model, true, true)
 }
 
+// errorsSaveCards - вывод ошибки при сохранении данных.
 func (c *CLI) errorsSaveCards(ctx context.Context, app *tview.Application, pages *tview.Pages) {
 	model := tview.NewModal()
 	model.SetText("Что-то пошло не так\n" +
@@ -106,6 +111,7 @@ func (c *CLI) errorsSaveCards(ctx context.Context, app *tview.Application, pages
 	pages.AddPage("ErrorsSaveCards", model, true, true)
 }
 
+// errorsSaveBinary - вывод ошибки при сохранении данных.
 func (c *CLI) errorsSaveBinary(ctx context.Context, app *tview.Application, pages *tview.Pages) {
 	model := tview.NewModal()
 	model.SetText("Что-то пошло не так\n" +
@@ -126,6 +132,7 @@ func (c *CLI) errorsSaveBinary(ctx context.Context, app *tview.Application, page
 	pages.AddPage("ErrorsSaveBinary", model, true, true)
 }
 
+// errorsSaveText - вывод ошибки при сохранении данных.
 func (c *CLI) errorsSaveText(ctx context.Context, app *tview.Application, pages *tview.Pages) {
 	model := tview.NewModal()
 	model.SetText("Что-то пошло не так\n" +

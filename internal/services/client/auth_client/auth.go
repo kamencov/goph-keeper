@@ -10,6 +10,8 @@ var (
 	ErrPasswordNotCorrect = errors.New("password is not correct")
 )
 
+// storage - интерфейс хранилища данных.
+//go:generate mockgen -source=auth.go -destination=auth_mock.go -package auth_client
 type storage interface {
 	SaveLoginAndToken(ctx context.Context, login, password, token string) error
 	UpdateLoginAndToken(ctx context.Context, userID int, token string) error
@@ -18,11 +20,13 @@ type storage interface {
 	GetUserToken(ctx context.Context, login string) (string, error)
 }
 
+// Service - сервис авторизации.
 type Service struct {
 	log *slog.Logger
 	db  storage
 }
 
+// NewService - конструктор.
 func NewService(log *slog.Logger, db storage) *Service {
 	return &Service{
 		log: log,
@@ -30,6 +34,7 @@ func NewService(log *slog.Logger, db storage) *Service {
 	}
 }
 
+// SaveTokenInBase - сохраняет токен в базе данных.
 func (s *Service) SaveTokenInBase(ctx context.Context, login, password, token string) error {
 	// получаем user_id с помощью login
 	userID, err := s.db.GetUserIDWithLogin(ctx, login)
@@ -48,6 +53,7 @@ func (s *Service) SaveTokenInBase(ctx context.Context, login, password, token st
 	return nil
 }
 
+// CheckUser - проверяет пользователя в базе данных.
 func (s *Service) CheckUser(ctx context.Context, login, password string) (string, error) {
 	pass, err := s.db.GetUserPassword(ctx, login)
 	if err != nil {
