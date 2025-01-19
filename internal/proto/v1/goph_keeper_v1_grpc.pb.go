@@ -25,6 +25,7 @@ const (
 // RegisterClient is the client API for Register service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//go:generate mockgen -source=goph_keeper_v1_grpc.pb.go -destination=goph_keeper_v1_grpc_mock.go -package=v1_pd
 type RegisterClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 }
@@ -223,101 +224,101 @@ var Auth_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	PostCredentials_PostLoginAndPassword_FullMethodName = "/goph_keeper_v1.PostCredentials/PostLoginAndPassword"
+	Health_Health_FullMethodName = "/goph_keeper_v1.Health/Health"
 )
 
-// PostCredentialsClient is the client API for PostCredentials service.
+// HealthClient is the client API for Health service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type PostCredentialsClient interface {
-	PostLoginAndPassword(ctx context.Context, in *PostLoginAndPasswordRequest, opts ...grpc.CallOption) (*Empty, error)
+type HealthClient interface {
+	Health(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
 }
 
-type postCredentialsClient struct {
+type healthClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewPostCredentialsClient(cc grpc.ClientConnInterface) PostCredentialsClient {
-	return &postCredentialsClient{cc}
+func NewHealthClient(cc grpc.ClientConnInterface) HealthClient {
+	return &healthClient{cc}
 }
 
-func (c *postCredentialsClient) PostLoginAndPassword(ctx context.Context, in *PostLoginAndPasswordRequest, opts ...grpc.CallOption) (*Empty, error) {
+func (c *healthClient) Health(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, PostCredentials_PostLoginAndPassword_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, Health_Health_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// PostCredentialsServer is the server API for PostCredentials service.
-// All implementations must embed UnimplementedPostCredentialsServer
+// HealthServer is the server API for Health service.
+// All implementations must embed UnimplementedHealthServer
 // for forward compatibility.
-type PostCredentialsServer interface {
-	PostLoginAndPassword(context.Context, *PostLoginAndPasswordRequest) (*Empty, error)
-	mustEmbedUnimplementedPostCredentialsServer()
+type HealthServer interface {
+	Health(context.Context, *Empty) (*Empty, error)
+	mustEmbedUnimplementedHealthServer()
 }
 
-// UnimplementedPostCredentialsServer must be embedded to have
+// UnimplementedHealthServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedPostCredentialsServer struct{}
+type UnimplementedHealthServer struct{}
 
-func (UnimplementedPostCredentialsServer) PostLoginAndPassword(context.Context, *PostLoginAndPasswordRequest) (*Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PostLoginAndPassword not implemented")
+func (UnimplementedHealthServer) Health(context.Context, *Empty) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Health not implemented")
 }
-func (UnimplementedPostCredentialsServer) mustEmbedUnimplementedPostCredentialsServer() {}
-func (UnimplementedPostCredentialsServer) testEmbeddedByValue()                         {}
+func (UnimplementedHealthServer) mustEmbedUnimplementedHealthServer() {}
+func (UnimplementedHealthServer) testEmbeddedByValue()                {}
 
-// UnsafePostCredentialsServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to PostCredentialsServer will
+// UnsafeHealthServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to HealthServer will
 // result in compilation errors.
-type UnsafePostCredentialsServer interface {
-	mustEmbedUnimplementedPostCredentialsServer()
+type UnsafeHealthServer interface {
+	mustEmbedUnimplementedHealthServer()
 }
 
-func RegisterPostCredentialsServer(s grpc.ServiceRegistrar, srv PostCredentialsServer) {
-	// If the following call pancis, it indicates UnimplementedPostCredentialsServer was
+func RegisterHealthServer(s grpc.ServiceRegistrar, srv HealthServer) {
+	// If the following call pancis, it indicates UnimplementedHealthServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&PostCredentials_ServiceDesc, srv)
+	s.RegisterService(&Health_ServiceDesc, srv)
 }
 
-func _PostCredentials_PostLoginAndPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PostLoginAndPasswordRequest)
+func _Health_Health_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PostCredentialsServer).PostLoginAndPassword(ctx, in)
+		return srv.(HealthServer).Health(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PostCredentials_PostLoginAndPassword_FullMethodName,
+		FullMethod: Health_Health_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PostCredentialsServer).PostLoginAndPassword(ctx, req.(*PostLoginAndPasswordRequest))
+		return srv.(HealthServer).Health(ctx, req.(*Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// PostCredentials_ServiceDesc is the grpc.ServiceDesc for PostCredentials service.
+// Health_ServiceDesc is the grpc.ServiceDesc for Health service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var PostCredentials_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "goph_keeper_v1.PostCredentials",
-	HandlerType: (*PostCredentialsServer)(nil),
+var Health_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "goph_keeper_v1.Health",
+	HandlerType: (*HealthServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "PostLoginAndPassword",
-			Handler:    _PostCredentials_PostLoginAndPassword_Handler,
+			MethodName: "Health",
+			Handler:    _Health_Health_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -325,305 +326,215 @@ var PostCredentials_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	PostTextData_PostTextData_FullMethodName = "/goph_keeper_v1.PostTextData/PostTextData"
+	SyncFromClient_SyncFromClientCredentials_FullMethodName = "/goph_keeper_v1.SyncFromClient/SyncFromClientCredentials"
+	SyncFromClient_SyncFromClientTextData_FullMethodName    = "/goph_keeper_v1.SyncFromClient/SyncFromClientTextData"
+	SyncFromClient_SyncFromClientBinaryData_FullMethodName  = "/goph_keeper_v1.SyncFromClient/SyncFromClientBinaryData"
+	SyncFromClient_SyncFromClientCards_FullMethodName       = "/goph_keeper_v1.SyncFromClient/SyncFromClientCards"
 )
 
-// PostTextDataClient is the client API for PostTextData service.
+// SyncFromClientClient is the client API for SyncFromClient service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type PostTextDataClient interface {
-	PostTextData(ctx context.Context, in *PostTextDataRequest, opts ...grpc.CallOption) (*Empty, error)
+type SyncFromClientClient interface {
+	SyncFromClientCredentials(ctx context.Context, in *SyncFromClientCredentialsRequest, opts ...grpc.CallOption) (*Empty, error)
+	SyncFromClientTextData(ctx context.Context, in *SyncFromClientTextDataRequest, opts ...grpc.CallOption) (*Empty, error)
+	SyncFromClientBinaryData(ctx context.Context, in *SyncFromClientBinaryDataRequest, opts ...grpc.CallOption) (*Empty, error)
+	SyncFromClientCards(ctx context.Context, in *SyncFromClientCardsRequest, opts ...grpc.CallOption) (*Empty, error)
 }
 
-type postTextDataClient struct {
+type syncFromClientClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewPostTextDataClient(cc grpc.ClientConnInterface) PostTextDataClient {
-	return &postTextDataClient{cc}
+func NewSyncFromClientClient(cc grpc.ClientConnInterface) SyncFromClientClient {
+	return &syncFromClientClient{cc}
 }
 
-func (c *postTextDataClient) PostTextData(ctx context.Context, in *PostTextDataRequest, opts ...grpc.CallOption) (*Empty, error) {
+func (c *syncFromClientClient) SyncFromClientCredentials(ctx context.Context, in *SyncFromClientCredentialsRequest, opts ...grpc.CallOption) (*Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, PostTextData_PostTextData_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, SyncFromClient_SyncFromClientCredentials_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// PostTextDataServer is the server API for PostTextData service.
-// All implementations must embed UnimplementedPostTextDataServer
-// for forward compatibility.
-type PostTextDataServer interface {
-	PostTextData(context.Context, *PostTextDataRequest) (*Empty, error)
-	mustEmbedUnimplementedPostTextDataServer()
+func (c *syncFromClientClient) SyncFromClientTextData(ctx context.Context, in *SyncFromClientTextDataRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, SyncFromClient_SyncFromClientTextData_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
-// UnimplementedPostTextDataServer must be embedded to have
+func (c *syncFromClientClient) SyncFromClientBinaryData(ctx context.Context, in *SyncFromClientBinaryDataRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, SyncFromClient_SyncFromClientBinaryData_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *syncFromClientClient) SyncFromClientCards(ctx context.Context, in *SyncFromClientCardsRequest, opts ...grpc.CallOption) (*Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, SyncFromClient_SyncFromClientCards_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// SyncFromClientServer is the server API for SyncFromClient service.
+// All implementations must embed UnimplementedSyncFromClientServer
+// for forward compatibility.
+type SyncFromClientServer interface {
+	SyncFromClientCredentials(context.Context, *SyncFromClientCredentialsRequest) (*Empty, error)
+	SyncFromClientTextData(context.Context, *SyncFromClientTextDataRequest) (*Empty, error)
+	SyncFromClientBinaryData(context.Context, *SyncFromClientBinaryDataRequest) (*Empty, error)
+	SyncFromClientCards(context.Context, *SyncFromClientCardsRequest) (*Empty, error)
+	mustEmbedUnimplementedSyncFromClientServer()
+}
+
+// UnimplementedSyncFromClientServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedPostTextDataServer struct{}
+type UnimplementedSyncFromClientServer struct{}
 
-func (UnimplementedPostTextDataServer) PostTextData(context.Context, *PostTextDataRequest) (*Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PostTextData not implemented")
+func (UnimplementedSyncFromClientServer) SyncFromClientCredentials(context.Context, *SyncFromClientCredentialsRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SyncFromClientCredentials not implemented")
 }
-func (UnimplementedPostTextDataServer) mustEmbedUnimplementedPostTextDataServer() {}
-func (UnimplementedPostTextDataServer) testEmbeddedByValue()                      {}
+func (UnimplementedSyncFromClientServer) SyncFromClientTextData(context.Context, *SyncFromClientTextDataRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SyncFromClientTextData not implemented")
+}
+func (UnimplementedSyncFromClientServer) SyncFromClientBinaryData(context.Context, *SyncFromClientBinaryDataRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SyncFromClientBinaryData not implemented")
+}
+func (UnimplementedSyncFromClientServer) SyncFromClientCards(context.Context, *SyncFromClientCardsRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SyncFromClientCards not implemented")
+}
+func (UnimplementedSyncFromClientServer) mustEmbedUnimplementedSyncFromClientServer() {}
+func (UnimplementedSyncFromClientServer) testEmbeddedByValue()                        {}
 
-// UnsafePostTextDataServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to PostTextDataServer will
+// UnsafeSyncFromClientServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to SyncFromClientServer will
 // result in compilation errors.
-type UnsafePostTextDataServer interface {
-	mustEmbedUnimplementedPostTextDataServer()
+type UnsafeSyncFromClientServer interface {
+	mustEmbedUnimplementedSyncFromClientServer()
 }
 
-func RegisterPostTextDataServer(s grpc.ServiceRegistrar, srv PostTextDataServer) {
-	// If the following call pancis, it indicates UnimplementedPostTextDataServer was
+func RegisterSyncFromClientServer(s grpc.ServiceRegistrar, srv SyncFromClientServer) {
+	// If the following call pancis, it indicates UnimplementedSyncFromClientServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&PostTextData_ServiceDesc, srv)
+	s.RegisterService(&SyncFromClient_ServiceDesc, srv)
 }
 
-func _PostTextData_PostTextData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PostTextDataRequest)
+func _SyncFromClient_SyncFromClientCredentials_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SyncFromClientCredentialsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PostTextDataServer).PostTextData(ctx, in)
+		return srv.(SyncFromClientServer).SyncFromClientCredentials(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PostTextData_PostTextData_FullMethodName,
+		FullMethod: SyncFromClient_SyncFromClientCredentials_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PostTextDataServer).PostTextData(ctx, req.(*PostTextDataRequest))
+		return srv.(SyncFromClientServer).SyncFromClientCredentials(ctx, req.(*SyncFromClientCredentialsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// PostTextData_ServiceDesc is the grpc.ServiceDesc for PostTextData service.
+func _SyncFromClient_SyncFromClientTextData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SyncFromClientTextDataRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SyncFromClientServer).SyncFromClientTextData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SyncFromClient_SyncFromClientTextData_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SyncFromClientServer).SyncFromClientTextData(ctx, req.(*SyncFromClientTextDataRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SyncFromClient_SyncFromClientBinaryData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SyncFromClientBinaryDataRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SyncFromClientServer).SyncFromClientBinaryData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SyncFromClient_SyncFromClientBinaryData_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SyncFromClientServer).SyncFromClientBinaryData(ctx, req.(*SyncFromClientBinaryDataRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SyncFromClient_SyncFromClientCards_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SyncFromClientCardsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SyncFromClientServer).SyncFromClientCards(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SyncFromClient_SyncFromClientCards_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SyncFromClientServer).SyncFromClientCards(ctx, req.(*SyncFromClientCardsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// SyncFromClient_ServiceDesc is the grpc.ServiceDesc for SyncFromClient service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var PostTextData_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "goph_keeper_v1.PostTextData",
-	HandlerType: (*PostTextDataServer)(nil),
+var SyncFromClient_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "goph_keeper_v1.SyncFromClient",
+	HandlerType: (*SyncFromClientServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "PostTextData",
-			Handler:    _PostTextData_PostTextData_Handler,
+			MethodName: "SyncFromClientCredentials",
+			Handler:    _SyncFromClient_SyncFromClientCredentials_Handler,
 		},
-	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "internal/proto/v1/goph_keeper_v1.proto",
-}
-
-const (
-	PostBinaryData_PostBinaryData_FullMethodName = "/goph_keeper_v1.PostBinaryData/PostBinaryData"
-)
-
-// PostBinaryDataClient is the client API for PostBinaryData service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type PostBinaryDataClient interface {
-	PostBinaryData(ctx context.Context, in *PostTextDataRequest, opts ...grpc.CallOption) (*Empty, error)
-}
-
-type postBinaryDataClient struct {
-	cc grpc.ClientConnInterface
-}
-
-func NewPostBinaryDataClient(cc grpc.ClientConnInterface) PostBinaryDataClient {
-	return &postBinaryDataClient{cc}
-}
-
-func (c *postBinaryDataClient) PostBinaryData(ctx context.Context, in *PostTextDataRequest, opts ...grpc.CallOption) (*Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Empty)
-	err := c.cc.Invoke(ctx, PostBinaryData_PostBinaryData_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// PostBinaryDataServer is the server API for PostBinaryData service.
-// All implementations must embed UnimplementedPostBinaryDataServer
-// for forward compatibility.
-type PostBinaryDataServer interface {
-	PostBinaryData(context.Context, *PostTextDataRequest) (*Empty, error)
-	mustEmbedUnimplementedPostBinaryDataServer()
-}
-
-// UnimplementedPostBinaryDataServer must be embedded to have
-// forward compatible implementations.
-//
-// NOTE: this should be embedded by value instead of pointer to avoid a nil
-// pointer dereference when methods are called.
-type UnimplementedPostBinaryDataServer struct{}
-
-func (UnimplementedPostBinaryDataServer) PostBinaryData(context.Context, *PostTextDataRequest) (*Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PostBinaryData not implemented")
-}
-func (UnimplementedPostBinaryDataServer) mustEmbedUnimplementedPostBinaryDataServer() {}
-func (UnimplementedPostBinaryDataServer) testEmbeddedByValue()                        {}
-
-// UnsafePostBinaryDataServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to PostBinaryDataServer will
-// result in compilation errors.
-type UnsafePostBinaryDataServer interface {
-	mustEmbedUnimplementedPostBinaryDataServer()
-}
-
-func RegisterPostBinaryDataServer(s grpc.ServiceRegistrar, srv PostBinaryDataServer) {
-	// If the following call pancis, it indicates UnimplementedPostBinaryDataServer was
-	// embedded by pointer and is nil.  This will cause panics if an
-	// unimplemented method is ever invoked, so we test this at initialization
-	// time to prevent it from happening at runtime later due to I/O.
-	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
-		t.testEmbeddedByValue()
-	}
-	s.RegisterService(&PostBinaryData_ServiceDesc, srv)
-}
-
-func _PostBinaryData_PostBinaryData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PostTextDataRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PostBinaryDataServer).PostBinaryData(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PostBinaryData_PostBinaryData_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PostBinaryDataServer).PostBinaryData(ctx, req.(*PostTextDataRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-// PostBinaryData_ServiceDesc is the grpc.ServiceDesc for PostBinaryData service.
-// It's only intended for direct use with grpc.RegisterService,
-// and not to be introspected or modified (even as a copy)
-var PostBinaryData_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "goph_keeper_v1.PostBinaryData",
-	HandlerType: (*PostBinaryDataServer)(nil),
-	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "PostBinaryData",
-			Handler:    _PostBinaryData_PostBinaryData_Handler,
+			MethodName: "SyncFromClientTextData",
+			Handler:    _SyncFromClient_SyncFromClientTextData_Handler,
 		},
-	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "internal/proto/v1/goph_keeper_v1.proto",
-}
-
-const (
-	PostCards_PostCards_FullMethodName = "/goph_keeper_v1.PostCards/PostCards"
-)
-
-// PostCardsClient is the client API for PostCards service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type PostCardsClient interface {
-	PostCards(ctx context.Context, in *PostTextDataRequest, opts ...grpc.CallOption) (*Empty, error)
-}
-
-type postCardsClient struct {
-	cc grpc.ClientConnInterface
-}
-
-func NewPostCardsClient(cc grpc.ClientConnInterface) PostCardsClient {
-	return &postCardsClient{cc}
-}
-
-func (c *postCardsClient) PostCards(ctx context.Context, in *PostTextDataRequest, opts ...grpc.CallOption) (*Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Empty)
-	err := c.cc.Invoke(ctx, PostCards_PostCards_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// PostCardsServer is the server API for PostCards service.
-// All implementations must embed UnimplementedPostCardsServer
-// for forward compatibility.
-type PostCardsServer interface {
-	PostCards(context.Context, *PostTextDataRequest) (*Empty, error)
-	mustEmbedUnimplementedPostCardsServer()
-}
-
-// UnimplementedPostCardsServer must be embedded to have
-// forward compatible implementations.
-//
-// NOTE: this should be embedded by value instead of pointer to avoid a nil
-// pointer dereference when methods are called.
-type UnimplementedPostCardsServer struct{}
-
-func (UnimplementedPostCardsServer) PostCards(context.Context, *PostTextDataRequest) (*Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PostCards not implemented")
-}
-func (UnimplementedPostCardsServer) mustEmbedUnimplementedPostCardsServer() {}
-func (UnimplementedPostCardsServer) testEmbeddedByValue()                   {}
-
-// UnsafePostCardsServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to PostCardsServer will
-// result in compilation errors.
-type UnsafePostCardsServer interface {
-	mustEmbedUnimplementedPostCardsServer()
-}
-
-func RegisterPostCardsServer(s grpc.ServiceRegistrar, srv PostCardsServer) {
-	// If the following call pancis, it indicates UnimplementedPostCardsServer was
-	// embedded by pointer and is nil.  This will cause panics if an
-	// unimplemented method is ever invoked, so we test this at initialization
-	// time to prevent it from happening at runtime later due to I/O.
-	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
-		t.testEmbeddedByValue()
-	}
-	s.RegisterService(&PostCards_ServiceDesc, srv)
-}
-
-func _PostCards_PostCards_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PostTextDataRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PostCardsServer).PostCards(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PostCards_PostCards_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PostCardsServer).PostCards(ctx, req.(*PostTextDataRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-// PostCards_ServiceDesc is the grpc.ServiceDesc for PostCards service.
-// It's only intended for direct use with grpc.RegisterService,
-// and not to be introspected or modified (even as a copy)
-var PostCards_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "goph_keeper_v1.PostCards",
-	HandlerType: (*PostCardsServer)(nil),
-	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "PostCards",
-			Handler:    _PostCards_PostCards_Handler,
+			MethodName: "SyncFromClientBinaryData",
+			Handler:    _SyncFromClient_SyncFromClientBinaryData_Handler,
+		},
+		{
+			MethodName: "SyncFromClientCards",
+			Handler:    _SyncFromClient_SyncFromClientCards_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -4,11 +4,10 @@ import (
 	"google.golang.org/grpc"
 	_ "google.golang.org/grpc/encoding/gzip"
 	handlerAuth "goph-keeper/internal/grpc/auth"
-	handlerBinaryData "goph-keeper/internal/grpc/binary_data"
-	handlerCards "goph-keeper/internal/grpc/cards"
-	handlerCredentials "goph-keeper/internal/grpc/credentials"
+	"goph-keeper/internal/grpc/health"
 	handlerRegister "goph-keeper/internal/grpc/register"
-	handlerTextData "goph-keeper/internal/grpc/text_data"
+	"goph-keeper/internal/grpc/sync"
+	"goph-keeper/internal/middleware/auth"
 	pd "goph-keeper/internal/proto/v1"
 	serviceAuth "goph-keeper/internal/services/server/auth"
 	binaryData "goph-keeper/internal/services/server/binary_data"
@@ -60,35 +59,38 @@ func Run(log *slog.Logger) error {
 	newServiceBinaryData := binaryData.NewService(log, db)
 	newServiceCards := cards.NewServiceCards(log, db)
 
+	// инициализируем проверку авторизацию.
+	authChecker := auth.NewMiddleware(log, newServiceAuth)
+
 	// Создаем grpc
 	registerUser := handlerRegister.NewHandlers(log, newServiceAuth)
 	authUser := handlerAuth.NewHandlers(log, newServiceAuth)
-	postCredentials := handlerCredentials.NewHandlers(log, newServiceCredentials)
-	postTextData := handlerTextData.NewHandlers(log, newServiceTextData)
-	postBinaryData := handlerBinaryData.NewHandlers(log, newServiceBinaryData)
-	postCards := handlerCards.NewHandlers(log, newServiceCards)
+	healthStatus := health.NewHandler(log)
+	newSync := sync.NewHandler(log, newServiceCredentials, newServiceTextData, newServiceBinaryData, newServiceCards)
 
 	// Создаем GRPC-сервер
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(authChecker.UnaryInterceptor))
 
 	// Регистрируем goph-keeper в GRPC-сервере
 	pd.RegisterRegisterServer(grpcServer, registerUser)
 	pd.RegisterAuthServer(grpcServer, authUser)
-	pd.RegisterPostCredentialsServer(grpcServer, postCredentials)
-	pd.RegisterPostTextDataServer(grpcServer, postTextData)
-	pd.RegisterPostBinaryDataServer(grpcServer, postBinaryData)
-	pd.RegisterPostCardsServer(grpcServer, postCards)
+	pd.RegisterHealthServer(grpcServer, healthStatus)
+	pd.RegisterSyncFromClientServer(grpcServer, newSync)
 
+	// канал для ошибки
+	errChan := make(chan error, 1)
 	go func() {
 		listener, err := net.Listen("tcp", flags.AddrGRPC)
 		log.Info("application start", "addr:", flags.AddrGRPC)
 		if err != nil {
 			log.Error("failed to listen", "error", err)
+			errChan <- err
 			return
 		}
 		log.Info("application run")
 		if err := grpcServer.Serve(listener); err != nil {
 			slog.Error("failed to serve", "error", err)
+			errChan <- err
 			return
 		}
 
@@ -98,7 +100,13 @@ func Run(log *slog.Logger) error {
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
 
-	<-stop
+	select {
+	case <-stop:
+		log.Info("received stop signal, shutting down")
+	case err := <-errChan:
+		log.Error("server encountered an error", "error", err)
+		return err
+	}
 
 	grpcServer.GracefulStop()
 

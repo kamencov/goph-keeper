@@ -6,13 +6,14 @@ import (
 	"log/slog"
 )
 
+// Resource - Структура для хранения данных.
 type Resource struct {
 	Resource string
 	Login    string
 	Password string
 }
 
-// Основная форма для ввода данных
+// credentials - Функция для отображения формы для ввода данных.
 func (c *CLI) credentials(ctx context.Context, app *tview.Application, pages *tview.Pages) *tview.Form {
 	const op = "cli.credentials"
 	c.log.With(slog.String("op", op))
@@ -35,6 +36,9 @@ func (c *CLI) credentials(ctx context.Context, app *tview.Application, pages *tv
 			// Открываем модальное окно подтверждения
 			c.saveResource(ctx, app, pages, form, &resource)
 		}).
+		AddButton("Back", func() {
+			pages.SwitchToPage("Buttons_data")
+		}).
 		AddButton("Quit", func() {
 			app.Stop()
 		})
@@ -43,7 +47,7 @@ func (c *CLI) credentials(ctx context.Context, app *tview.Application, pages *tv
 	return form
 }
 
-// Модальное окно подтверждения сохранения
+// saveResource - Модальное окно подтверждения сохранения.
 func (c *CLI) saveResource(
 	ctx context.Context,
 	app *tview.Application,
@@ -65,8 +69,8 @@ func (c *CLI) saveResource(
 			case "Save":
 				err := c.save.PostLoginAndPassword(ctx, c.token, resource.Resource, resource.Login, resource.Password)
 				if err != nil {
-					c.log.Error("failed save credentials", "error", err)
-					c.errorsSave(ctx, app, pages)
+					c.log.Error("failed handlers credentials", "error", err)
+					c.errorsSaveCredentials(ctx, app, pages)
 				} else {
 					pages.SwitchToPage("Buttons_data")
 				}
@@ -84,7 +88,7 @@ func (c *CLI) saveResource(
 	pages.AddPage("SaveConfirmation", modal, true, true)
 }
 
-// Сбрасывает данные в форме и структуре
+// clearFormResource - Сбрасывает данные в форме и структуре.
 func clearFormResource(form *tview.Form, resource *Resource) {
 	resource.Resource = ""
 	resource.Login = ""

@@ -5,10 +5,12 @@ import (
 	"github.com/rivo/tview"
 )
 
+// TextData - структура для хранения текста.
 type TextData struct {
 	Text string
 }
 
+// textButton - функция, которая создает и возвращает форму для ввода текста.
 func (c *CLI) textButton(ctx context.Context, app *tview.Application, pages *tview.Pages) *tview.Form {
 	var textData TextData
 	form := tview.NewForm()
@@ -18,7 +20,10 @@ func (c *CLI) textButton(ctx context.Context, app *tview.Application, pages *tvi
 	}).
 		AddButton("Save", func() {
 			// Показываем подтверждение сохранения
-			c.saveTextData(pages, form, &textData)
+			c.saveTextData(ctx, app, pages, form, &textData)
+		}).
+		AddButton("Back", func() {
+			pages.SwitchToPage("Buttons_data")
 		}).
 		AddButton("Quit", func() {
 			app.Stop()
@@ -26,8 +31,8 @@ func (c *CLI) textButton(ctx context.Context, app *tview.Application, pages *tvi
 	return form
 }
 
-// Модальное окно подтверждения сохранения
-func (c *CLI) saveTextData(pages *tview.Pages, form *tview.Form, textData *TextData) {
+// saveTextData - Модальное окно подтверждения сохранения.
+func (c *CLI) saveTextData(ctx context.Context, app *tview.Application, pages *tview.Pages, form *tview.Form, textData *TextData) {
 	modal := tview.NewModal().
 		SetText("Вы хотите сохранить данные?\n" +
 			"Text: " + textData.Text).
@@ -35,8 +40,13 @@ func (c *CLI) saveTextData(pages *tview.Pages, form *tview.Form, textData *TextD
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if buttonLabel == "Save" {
 				// Возврат в главное меню после сохранения
-				clearFormTextData(form, textData)
-				pages.SwitchToPage("Buttons_data")
+				err := c.save.PostTextData(ctx, c.token, textData.Text)
+				if err != nil {
+					c.log.Error("failed handlers credentials", "error", err)
+					c.errorsSaveText(ctx, app, pages)
+				} else {
+					pages.SwitchToPage("Buttons_data")
+				}
 			} else if buttonLabel == "Correct" {
 				pages.SwitchToPage("Text")
 			} else {
@@ -50,7 +60,7 @@ func (c *CLI) saveTextData(pages *tview.Pages, form *tview.Form, textData *TextD
 	pages.AddPage("SaveConfirmation", modal, true, true)
 }
 
-// Сбрасывает данные в форме и структуре
+// clearFormTextData - Сбрасывает данные в форме и структуре.
 func clearFormTextData(form *tview.Form, textData *TextData) {
 	textData.Text = ""
 

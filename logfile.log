@@ -1,4 +1,1 @@
-time=2024-12-23T22:55:12.728+03:00 level=INFO msg="connected to database"
-time=2024-12-23T22:55:16.586+03:00 level=INFO msg="Switching to AuthUser page"
-time=2024-12-23T22:55:20.990+03:00 level=INFO msg="access token updated"
-time=2024-12-23T22:55:36.672+03:00 level=INFO msg="start credentials"
+time=2025-01-19T19:34:10.117+03:00 level=ERROR msg="health.repositories.app: failed to register user"

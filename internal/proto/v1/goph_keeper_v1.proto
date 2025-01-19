@@ -24,25 +24,58 @@ message AuthResponse {
   string message = 2;
 }
 
-message PostLoginAndPasswordRequest {
-  string resource = 1;
-  string login = 2;
-  string password = 3;
+message SyncFromClientCredentialsRequest {
+  repeated Credentials task = 1;
 }
 
-message PostTextDataRequest {
-  reserved 1;
-  string data = 2;
+message Credentials {
+  int32 id = 1;
+  int32 id_user = 2;
+  string resource = 3;
+  string login = 4;
+  string password = 5;
+  string updated_at = 6;
+  string action   = 7;
+  string access_token = 8;
 }
 
-message PostBinaryDataRequest {
-  reserved 1;
-  bytes data = 2;
+message SyncFromClientTextDataRequest {
+  repeated TextData task = 1;
 }
 
-message PostCardsRequest {
-  reserved 1;
-  string data = 2;
+message TextData {
+  int32 id = 1;
+  int32 id_user = 2;
+  string text = 3;
+  string updated_at = 4;
+  string action   = 5;
+  string access_token = 6;
+}
+
+message SyncFromClientBinaryDataRequest {
+  repeated BinaryData task = 1;
+}
+
+message BinaryData {
+  int32 id = 1;
+  int32 id_user = 2;
+  string binary = 3;
+  string updated_at = 4;
+  string action   = 5;
+  string access_token = 6;
+}
+
+message SyncFromClientCardsRequest {
+  repeated Cards task = 1;
+}
+
+message Cards {
+  int32 id = 1;
+  int32 id_user = 2;
+  string cards = 3;
+  string updated_at = 4;
+  string action   = 5;
+  string access_token = 6;
 }
 
 message Empty {
@@ -57,18 +90,13 @@ service Auth {
   rpc Auth(AuthRequest) returns (AuthResponse);
 }
 
-service PostCredentials {
-  rpc PostLoginAndPassword(PostLoginAndPasswordRequest) returns (Empty);
+service Health {
+  rpc Health(Empty) returns (Empty);
 }
 
-service PostTextData{
-  rpc PostTextData(PostTextDataRequest) returns (Empty);
-}
-
-service PostBinaryData{
-  rpc PostBinaryData(PostTextDataRequest) returns (Empty);
-}
-
-service PostCards{
-  rpc PostCards(PostTextDataRequest) returns (Empty);
+service SyncFromClient {
+  rpc SyncFromClientCredentials(SyncFromClientCredentialsRequest) returns (Empty);
+  rpc SyncFromClientTextData(SyncFromClientTextDataRequest) returns (Empty);
+  rpc SyncFromClientBinaryData(SyncFromClientBinaryDataRequest) returns (Empty);
+  rpc SyncFromClientCards(SyncFromClientCardsRequest) returns (Empty);
 }

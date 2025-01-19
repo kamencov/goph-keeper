@@ -1,0 +1,309 @@
+basePath: /api/v1
+definitions:
+  v1_pd.AuthRequest:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    type: object
+  v1_pd.AuthResponse:
+    properties:
+      message:
+        type: string
+      token:
+        type: string
+    type: object
+  v1_pd.BinaryData:
+    properties:
+      access_token:
+        type: string
+      action:
+        type: string
+      binary:
+        type: string
+      id:
+        type: integer
+      id_user:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  v1_pd.Cards:
+    properties:
+      access_token:
+        type: string
+      action:
+        type: string
+      cards:
+        type: string
+      id:
+        type: integer
+      id_user:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  v1_pd.Credentials:
+    properties:
+      access_token:
+        type: string
+      action:
+        type: string
+      id:
+        type: integer
+      id_user:
+        type: integer
+      login:
+        type: string
+      password:
+        type: string
+      resource:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  v1_pd.Empty:
+    properties:
+      message:
+        type: string
+    type: object
+  v1_pd.RegisterRequest:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    type: object
+  v1_pd.RegisterResponse:
+    properties:
+      message:
+        type: string
+      uid:
+        type: integer
+    type: object
+  v1_pd.SyncFromClientBinaryDataRequest:
+    properties:
+      task:
+        items:
+          $ref: '#/definitions/v1_pd.BinaryData'
+        type: array
+    type: object
+  v1_pd.SyncFromClientCardsRequest:
+    properties:
+      task:
+        items:
+          $ref: '#/definitions/v1_pd.Cards'
+        type: array
+    type: object
+  v1_pd.SyncFromClientCredentialsRequest:
+    properties:
+      task:
+        items:
+          $ref: '#/definitions/v1_pd.Credentials'
+        type: array
+    type: object
+  v1_pd.SyncFromClientTextDataRequest:
+    properties:
+      task:
+        items:
+          $ref: '#/definitions/v1_pd.TextData'
+        type: array
+    type: object
+  v1_pd.TextData:
+    properties:
+      access_token:
+        type: string
+      action:
+        type: string
+      id:
+        type: integer
+      id_user:
+        type: integer
+      text:
+        type: string
+      updated_at:
+        type: string
+    type: object
+host: localhost:8081
+info:
+  contact: {}
+  description: API for GophKeeper service
+  title: GophKeeper API
+  version: "1.0"
+paths:
+  /goph_keeper_v1.Auth/Auth:
+    post:
+      consumes:
+      - application/json
+      description: Авторизует пользователя.
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1_pd.AuthRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1_pd.AuthResponse'
+        "400":
+          description: password or login is empty
+        "401":
+          description: password is not correct
+        "404":
+          description: login is not correct
+        "500":
+          description: failed to auth user
+      summary: Авторизует пользователя.
+      tags:
+      - POST
+  /goph_keeper_v1.Health/Health:
+    get:
+      consumes:
+      - application/json
+      description: Проверяет работоспособность сервиса.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1_pd.Empty'
+      summary: Проверяет работоспособность сервиса.
+      tags:
+      - GET
+  /goph_keeper_v1.SyncFromClient/Register:
+    post:
+      consumes:
+      - application/json
+      description: Регистрация пользователя.
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1_pd.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1_pd.RegisterResponse'
+        "500":
+          description: failed to register user
+      summary: Регистрация пользователя.
+      tags:
+      - POST
+  /goph_keeper_v1.SyncFromClient/SyncFromClientBinaryData:
+    post:
+      consumes:
+      - application/json
+      description: Синхронизирует бинарные данные. Выполняя действия, такие как сохранение
+        или удаление, на основе указанных задач.
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1_pd.SyncFromClientBinaryDataRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1_pd.Empty'
+        "500":
+          description: failed to deleted
+      summary: Синхронизирует бинарные данные.
+      tags:
+      - POST
+  /goph_keeper_v1.SyncFromClient/SyncFromClientCards:
+    post:
+      consumes:
+      - application/json
+      description: Синхронизирует карты. Выполняя действия, такие как сохранение или
+        удаление, на основе указанных задач.
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1_pd.SyncFromClientCardsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1_pd.Empty'
+        "500":
+          description: failed to deleted
+      summary: Синхронизирует карты.
+      tags:
+      - POST
+  /goph_keeper_v1.SyncFromClient/SyncFromClientCredentials:
+    post:
+      consumes:
+      - application/json
+      description: Синхронизирует учётные данные. Выполняя действия, такие как сохранение
+        или удаление, на основе указанных задач.
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1_pd.SyncFromClientCredentialsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1_pd.Empty'
+        "500":
+          description: failed to deleted
+      summary: Синхронизирует учётные данные.
+      tags:
+      - POST
+  /goph_keeper_v1.SyncFromClient/SyncFromClientTextData:
+    post:
+      consumes:
+      - application/json
+      description: Синхронизирует текстовые данные. Выполняя действия, такие как сохранение
+        или удаление, на основе указанных задач.
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1_pd.SyncFromClientTextDataRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1_pd.Empty'
+        "500":
+          description: failed to deleted
+      summary: Синхронизирует текстовые данные.
+      tags:
+      - POST
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

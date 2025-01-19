@@ -5,6 +5,7 @@ import (
 	"github.com/rivo/tview"
 )
 
+// errorsRegister - вывод ошибки при регистрации.
 func (c *CLI) errorsRegister(ctx context.Context, app *tview.Application, pages *tview.Pages) {
 
 	model := tview.NewModal()
@@ -26,6 +27,7 @@ func (c *CLI) errorsRegister(ctx context.Context, app *tview.Application, pages 
 	pages.AddPage("ErrorsRegister", model, true, true)
 }
 
+// errorsAuth - вывод ошибки при авторизации.
 func (c *CLI) errorsAuth(ctx context.Context, app *tview.Application, pages *tview.Pages) {
 	model := tview.NewModal()
 	model.SetText("Что-то пошло не так\n" +
@@ -35,8 +37,8 @@ func (c *CLI) errorsAuth(ctx context.Context, app *tview.Application, pages *tvi
 		AddButtons([]string{"Auth", "Cancel"}).
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if buttonLabel == "Auth" {
-				pages.AddPage("Register", c.register(ctx, app, pages), true, false)
-				pages.SwitchToPage("Register")
+				pages.AddPage("Auth", c.authUser(ctx, app, pages), true, false)
+				pages.SwitchToPage("Auth")
 			} else {
 				app.Stop()
 			}
@@ -46,7 +48,29 @@ func (c *CLI) errorsAuth(ctx context.Context, app *tview.Application, pages *tvi
 	pages.AddPage("ErrorsAuth", model, true, true)
 }
 
-func (c *CLI) errorsSave(ctx context.Context, app *tview.Application, pages *tview.Pages) {
+// errorsAuthOffLine - вывод ошибки при авторизации.
+func (c *CLI) errorsAuthOffLine(ctx context.Context, app *tview.Application, pages *tview.Pages) {
+	model := tview.NewModal()
+	model.SetText("Что-то пошло не так\n" +
+		"Выберите действие:\n" +
+		"1. Auth: Повторно пройти авторизацию\n" +
+		"2. Cancel: Закрыть приложение\n").
+		AddButtons([]string{"Auth", "Cancel"}).
+		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+			if buttonLabel == "Auth" {
+				pages.AddPage("AuthOffLine", c.authUserOffline(ctx, app, pages), true, false)
+				pages.SwitchToPage("AuthOffLine")
+			} else {
+				app.Stop()
+			}
+		})
+
+	// Добавляем модальное окно как новую страницу
+	pages.AddPage("ErrorsAuthOffLine", model, true, true)
+}
+
+// errorsSaveCredentials - вывод ошибки при сохранении данных.
+func (c *CLI) errorsSaveCredentials(ctx context.Context, app *tview.Application, pages *tview.Pages) {
 	model := tview.NewModal()
 	model.SetText("Что-то пошло не так\n" +
 		"Выберите действие:\n" +
@@ -63,5 +87,68 @@ func (c *CLI) errorsSave(ctx context.Context, app *tview.Application, pages *tvi
 		})
 
 	// Добавляем модальное окно как новую страницу
-	pages.AddPage("ErrorsSave", model, true, true)
+	pages.AddPage("ErrorsSaveCredentials", model, true, true)
+}
+
+// errorsSaveCards - вывод ошибки при сохранении данных.
+func (c *CLI) errorsSaveCards(ctx context.Context, app *tview.Application, pages *tview.Pages) {
+	model := tview.NewModal()
+	model.SetText("Что-то пошло не так\n" +
+		"Выберите действие:\n" +
+		"1. Save: Повторно сохранить данные\n" +
+		"2. Cancel: Закрыть приложение\n").
+		AddButtons([]string{"Save", "Cancel"}).
+		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+			if buttonLabel == "Save" {
+				pages.AddPage("Card", c.cardButton(ctx, app, pages), true, false)
+				pages.SwitchToPage("Card")
+			} else {
+				app.Stop()
+			}
+		})
+
+	// Добавляем модальное окно как новую страницу
+	pages.AddPage("ErrorsSaveCards", model, true, true)
+}
+
+// errorsSaveBinary - вывод ошибки при сохранении данных.
+func (c *CLI) errorsSaveBinary(ctx context.Context, app *tview.Application, pages *tview.Pages) {
+	model := tview.NewModal()
+	model.SetText("Что-то пошло не так\n" +
+		"Выберите действие:\n" +
+		"1. Save: Повторно сохранить данные\n" +
+		"2. Cancel: Закрыть приложение\n").
+		AddButtons([]string{"Save", "Cancel"}).
+		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+			if buttonLabel == "Save" {
+				pages.AddPage("Binary", c.binaryButton(ctx, app, pages), true, false)
+				pages.SwitchToPage("Binary")
+			} else {
+				app.Stop()
+			}
+		})
+
+	// Добавляем модальное окно как новую страницу
+	pages.AddPage("ErrorsSaveBinary", model, true, true)
+}
+
+// errorsSaveText - вывод ошибки при сохранении данных.
+func (c *CLI) errorsSaveText(ctx context.Context, app *tview.Application, pages *tview.Pages) {
+	model := tview.NewModal()
+	model.SetText("Что-то пошло не так\n" +
+		"Выберите действие:\n" +
+		"1. Save: Повторно сохранить данные\n" +
+		"2. Cancel: Закрыть приложение\n").
+		AddButtons([]string{"Save", "Cancel"}).
+		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+			if buttonLabel == "Save" {
+				pages.AddPage("Text", c.textButton(ctx, app, pages), true, false)
+				pages.SwitchToPage("Text")
+			} else {
+				app.Stop()
+			}
+		})
+
+	// Добавляем модальное окно как новую страницу
+	pages.AddPage("ErrorsSaveText", model, true, true)
 }

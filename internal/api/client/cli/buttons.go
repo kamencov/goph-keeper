@@ -5,6 +5,7 @@ import (
 	"github.com/rivo/tview"
 )
 
+// buttonsStart - основная форма online.
 func (c *CLI) buttonsStart(ctx context.Context, app *tview.Application, pages *tview.Pages) *tview.Form {
 	form := tview.NewForm()
 	form.
@@ -29,13 +30,53 @@ func (c *CLI) buttonsStart(ctx context.Context, app *tview.Application, pages *t
 		"1. Регистрация: Если вы впервые, то требуется пройти регистрацию\n" +
 		"2. Авторизация: Если вы уже зарегистрированы, то требуется пройти авторизацию\n"))
 
+	// Добавляем информацию о версии и дате
+	version := "Version: 1.0.0"           // Укажите версию программы
+	buildDate := "Build Date: 2025-01-19" // Укажите дату сборки
+	form.AddFormItem(tview.NewTextView().
+		SetText(version + "\n" + buildDate).
+		SetTextAlign(tview.AlignBottom).
+		SetDynamicColors(true))
+
 	return form
 }
 
+// buttonsOffline - основная форма offline.
+func (c *CLI) buttonsOffline(ctx context.Context, app *tview.Application, pages *tview.Pages) *tview.Form {
+	form := tview.NewForm()
+	form.
+		AddButton("Auth", func() {
+			c.log.Info("Switching to AuthUser page")
+			pages.AddPage("AuthUser", c.authUserOffline(ctx, app, pages), true, false)
+			pages.SwitchToPage("AuthUser")
+		}).
+		AddButton("Quit", func() {
+			c.log.Info("Stopping application")
+			app.Stop()
+		})
+
+	form.SetBorder(true).SetTitle("goph-keeper").
+		SetTitleAlign(tview.AlignCenter)
+
+	form.AddFormItem(tview.NewTextView().SetText("Добро пожаловать в оффлаин режим!\n" +
+		"Данный режим только для уже зарегистрированных пользователей\n"))
+
+	// Добавляем информацию о версии и дате
+	version := "Version: 1.0.0"           // Укажите версию программы
+	buildDate := "Build Date: 2025-01-19" // Укажите дату сборки
+	form.AddFormItem(tview.NewTextView().
+		SetText(version + "\n" + buildDate).
+		SetTextAlign(tview.AlignBottom).
+		SetDynamicColors(true))
+
+	return form
+}
+
+// buttonsData - основная форма для работы с данными.
 func (c *CLI) buttonsData(ctx context.Context, app *tview.Application, pages *tview.Pages) *tview.Form {
 	form := tview.NewForm()
 	form.
-		AddButton("Find all data", func() {
+		AddButton("Find and delete", func() {
 			// открывает перечень всего сохраненного
 			c.getResource(ctx, app, pages)
 		}).
@@ -62,7 +103,7 @@ func (c *CLI) buttonsData(ctx context.Context, app *tview.Application, pages *tv
 		SetTitleAlign(tview.AlignCenter)
 
 	form.AddFormItem(tview.NewTextView().SetText("Выберите действие:\n" +
-		"1. Find all data: Если вы хотите посмотреть все сохраненные данные\n" +
+		"1. Find and delete: Найти или удалить данные\n" +
 		"2. Credentials: Если вы хотите сохранить данные\n" +
 		"3. Text: Если вы хотите сохранить текст\n" +
 		"4. Binary: Если вы хотите сохранить бинарные данные\n" +

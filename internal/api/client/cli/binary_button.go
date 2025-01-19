@@ -5,10 +5,12 @@ import (
 	"github.com/rivo/tview"
 )
 
+// BinaryDataCLI - Структура для хранения данных.
 type BinaryDataCLI struct {
 	Data string
 }
 
+// binaryButton - Основная форма для ввода данных.
 func (c *CLI) binaryButton(ctx context.Context, app *tview.Application, pages *tview.Pages) *tview.Form {
 	var binaryData BinaryDataCLI
 	form := tview.NewForm()
@@ -18,7 +20,10 @@ func (c *CLI) binaryButton(ctx context.Context, app *tview.Application, pages *t
 		}).
 		AddButton("Save", func() {
 			// Показываем подтверждение сохранения
-			c.saveBinaryData(pages, form, &binaryData)
+			c.saveBinaryData(ctx, app, pages, form, &binaryData)
+		}).
+		AddButton("Back", func() {
+			pages.SwitchToPage("Buttons_data")
 		}).
 		AddButton("Quit", func() {
 			app.Stop()
@@ -27,16 +32,21 @@ func (c *CLI) binaryButton(ctx context.Context, app *tview.Application, pages *t
 
 }
 
-func (c *CLI) saveBinaryData(pages *tview.Pages, form *tview.Form, binaryData *BinaryDataCLI) {
+// saveBinaryData - Показываем подтверждение сохранения.
+func (c *CLI) saveBinaryData(ctx context.Context, app *tview.Application, pages *tview.Pages, form *tview.Form, binaryData *BinaryDataCLI) {
 	model := tview.NewModal()
 	model.SetText("Вы хотите сохранить данные?\n" +
 		"Binary: " + binaryData.Data)
 	model.AddButtons([]string{"Save", "Correct", "Cancel"})
 	model.SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 		if buttonLabel == "Save" {
-			// Возврат в главное меню после сохранения
-			clearFormBinary(form, binaryData)
-			pages.SwitchToPage("Buttons_data")
+			err := c.save.PostBinaryData(ctx, c.token, binaryData.Data)
+			if err != nil {
+				c.log.Error("failed handlers credentials", "error", err)
+				c.errorsSaveBinary(ctx, app, pages)
+			} else {
+				pages.SwitchToPage("Buttons_data")
+			}
 		} else if buttonLabel == "Correct" {
 			pages.SwitchToPage("Binary")
 		} else {
@@ -50,7 +60,7 @@ func (c *CLI) saveBinaryData(pages *tview.Pages, form *tview.Form, binaryData *B
 	pages.AddPage("SaveConfirmation", model, true, true)
 }
 
-// Сбрасывает данные в форме и структуре
+// clearFormBinary - Сбрасывает данные в форме и структуре.
 func clearFormBinary(form *tview.Form, binaryData *BinaryDataCLI) {
 	binaryData.Data = ""
 

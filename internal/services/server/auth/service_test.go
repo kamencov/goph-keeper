@@ -15,11 +15,11 @@ func TestNewServiceAuth(t *testing.T) {
 		&slog.HandlerOptions{
 			Level: slog.LevelDebug}))
 
-	storage := NewMockstorageAuth(ctrl)
+	db := NewMockstorageAuth(ctrl)
 
-	serv := NewServiceAuth([]byte("salt"), []byte("salt"), time.Hour, log, storage)
+	serv := NewServiceAuth([]byte("salt"), []byte("salt"), time.Hour, log, db)
 
 	if serv == nil {
-		t.Errorf("ServiceAuth is nil")
+		t.Errorf("ServiceAuth is not nil")
 	}
 }

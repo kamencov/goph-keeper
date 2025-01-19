@@ -5,26 +5,31 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"goph-keeper/internal/api/client/cli"
-	auth2 "goph-keeper/internal/api/client/handlers/auth"
-	"goph-keeper/internal/api/client/handlers/save"
+	"goph-keeper/internal/api/client/handlers"
+	auth2 "goph-keeper/internal/api/client/repositories/auth"
+	"goph-keeper/internal/api/client/repositories/health"
+	"goph-keeper/internal/api/client/repositories/sync_client"
 	"goph-keeper/internal/services/client/auth_client"
 	"goph-keeper/internal/services/client/binary_data_client"
 	"goph-keeper/internal/services/client/cards_client"
 	"goph-keeper/internal/services/client/credentials_client"
-	"goph-keeper/internal/services/client/get_all_data"
+	"goph-keeper/internal/services/client/get_and_deleted_data"
 	"goph-keeper/internal/services/client/text_data_client"
+	workers2 "goph-keeper/internal/services/workers"
 	"goph-keeper/internal/storage/sqlite"
+	"goph-keeper/internal/workers"
 	"log/slog"
 	"os"
 )
 
-const host = "localhost:8081"
+const defaultHost = "localhost:8081"
 
+// RunClient - запускает приложение client
 func RunClient() error {
 	// Создаем или открываем файл
 	file, err := os.Create("logfile.log")
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer func(file *os.File) {
 		err := file.Close()
@@ -42,16 +47,26 @@ func RunClient() error {
 		return err
 	}
 
+	defer func(db *sqlite.Storage) {
+		err := db.Close()
+		if err != nil {
+
+		}
+	}(db)
+
 	// Инициализируем сервисы
 	newServiceAuth := auth_client.NewService(log, db)
 	newServiceCredentials := credentials_client.NewService(log, db)
 	newServiceTextData := text_data_client.NewService(log, db)
 	newServiceBinaryData := binary_data_client.NewService(log, db)
 	newServiceCard := cards_client.NewService(log, db)
-	newServiceGet := get_all_data.NewService(log, db)
+	newServiceData := get_and_deleted_data.NewService(log, db)
+
+	repoSync := sync_client.NewHandlers(log)
+	newServiceWorker := workers2.NewService(log, db, repoSync)
 
 	conn, err := grpc.Dial(
-		host,
+		defaultHost,
 		grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Error("failed to connect client", "error", err)
@@ -69,19 +84,20 @@ func RunClient() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	//Инициализация воркера
+	newWorker := workers.NewWorker(log, newServiceWorker, conn)
+
+	go newWorker.Run(ctx)
+
 	newAuthHandler := auth2.NewHandlers(log, newServiceAuth)
-	newSaveHandler := save.NewHandlers(log, newServiceCredentials, newServiceTextData, newServiceBinaryData, newServiceCard)
+	newSaveHandler := handlers.NewHandlers(log, newServiceCredentials, newServiceTextData, newServiceBinaryData, newServiceCard)
+	newHealth := health.NewHandlers(log)
 
 	// Инициализация интерфейса CLI
-	newCLI := cli.NewCLI(log, newAuthHandler, newSaveHandler, newServiceGet, conn)
+	newCLI := cli.NewCLI(log, newAuthHandler, newSaveHandler, newServiceData, newServiceData, newHealth, conn)
 
 	// Запуск интерфейса CLI
-
 	newCLI.RunCLI(ctx)
 
-	// Инициализация воркера
-	//newWorker := workers.NewWorker(nil)
-
-	//go newWorker.Run(ctx)
 	return nil
 }

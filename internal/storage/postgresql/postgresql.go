@@ -108,7 +108,7 @@ func (p *Postgresql) SaveUser(ctx context.Context, login, hashPassword string) e
 	query := "INSERT INTO users (login, password) VALUES ($1, $2)"
 	_, err := p.storage.Exec(query, login, hashPassword)
 	if err != nil {
-		p.log.Error("failed to save user", "error", err)
+		p.log.Error("failed to handlers user", "error", err)
 		return err
 	}
 
@@ -121,14 +121,14 @@ func (p *Postgresql) SaveTableUserAndUpdateToken(login, accessToken string) erro
 
 	_, err := p.storage.Exec(query, accessToken, login)
 	if err != nil {
-		p.log.Error("failed to save access token", "error", err)
+		p.log.Error("failed to handlers access token", "error", err)
 		return err
 	}
 	return nil
 }
 
-// SaveLoginAndPasswordInCredentials - сохраняет полученный логин и пароль от ресурса в базу.
-func (p *Postgresql) SaveLoginAndPasswordInCredentials(
+// ServerSaveLoginAndPasswordInCredentials - сохраняет полученный логин и пароль от ресурса в базу.
+func (p *Postgresql) ServerSaveLoginAndPasswordInCredentials(
 	ctx context.Context,
 	userID int,
 	resource string,
@@ -138,20 +138,20 @@ func (p *Postgresql) SaveLoginAndPasswordInCredentials(
 
 	_, err := p.storage.ExecContext(ctx, query, userID, resource, login, password)
 	if err != nil {
-		p.log.Error("failed to save in credentials", "error", err)
+		p.log.Error("failed to handlers in credentials", "error", err)
 		return err
 	}
 
 	return nil
 }
 
-// SaveTextData - сохраняет получены текст в базу.
-func (p *Postgresql) SaveTextData(ctx context.Context, userID int, data string) error {
-	query := `INSERT INTO text_data (user_id, data) VALUES ($1, $2)`
+// SaveTextDataPstgres - сохраняет получены текст в базу.
+func (p *Postgresql) SaveTextDataPstgres(ctx context.Context, userID int, data string) error {
+	query := `INSERT INTO text_data (user_id, text) VALUES ($1, $2)`
 
 	_, err := p.storage.ExecContext(ctx, query, userID, data)
 	if err != nil {
-		p.log.Error("failed to save in credentials", "error", err)
+		p.log.Error("failed to handlers in credentials", "error", err)
 		return err
 	}
 
@@ -159,12 +159,12 @@ func (p *Postgresql) SaveTextData(ctx context.Context, userID int, data string) 
 }
 
 // SaveBinaryData - сохраняет полученные бинарные данные.
-func (p *Postgresql) SaveBinaryData(ctx context.Context, uid int, data string) error {
-	query := `INSERT INTO binary_data (user_id, data) VALUES ($1, $2)`
+func (p *Postgresql) SaveBinaryDataBinary(ctx context.Context, uid int, data string) error {
+	query := `INSERT INTO binary_data (user_id, binary_data) VALUES ($1, $2)`
 
 	_, err := p.storage.ExecContext(ctx, query, uid, data)
 	if err != nil {
-		p.log.Error("failed to save in credentials", "error", err)
+		p.log.Error("failed to handlers in credentials", "error", err)
 		return err
 	}
 
@@ -177,7 +177,7 @@ func (p *Postgresql) SaveCards(ctx context.Context, userID int, cards string) er
 
 	_, err := p.storage.ExecContext(ctx, query, userID, cards)
 	if err != nil {
-		p.log.Error("failed to save in cards", "error", err)
+		p.log.Error("failed to handlers in cards", "error", err)
 		return err
 	}
 
@@ -217,4 +217,48 @@ func (p *Postgresql) GetUserIDByLogin(ctx context.Context, login string) (int, e
 	}
 
 	return uid, nil
+}
+
+func (p *Postgresql) DeletedCredentials(ctx context.Context, userID int, resource string) error {
+	query := `UPDATE credentials SET deleted = 1 WHERE user_id = $1 AND resource = $2`
+
+	_, err := p.storage.ExecContext(ctx, query, userID, resource)
+	if err != nil {
+		p.log.Error("failed to deleted credentials", "error", err)
+		return err
+	}
+	return nil
+}
+
+func (p *Postgresql) DeletedText(ctx context.Context, userID int, data string) error {
+	query := `UPDATE text_data SET deleted = 1 WHERE user_id = $1 AND text = $2`
+
+	_, err := p.storage.ExecContext(ctx, query, userID, data)
+	if err != nil {
+		p.log.Error("failed to deleted text", "error", err)
+		return err
+	}
+	return nil
+}
+
+func (p *Postgresql) DeletedBinary(ctx context.Context, userID int, data string) error {
+	query := `UPDATE binary_data SET deleted = 1 WHERE user_id = $1 AND binary_data = $2`
+
+	_, err := p.storage.ExecContext(ctx, query, userID, data)
+	if err != nil {
+		p.log.Error("failed to deleted binary", "error", err)
+		return err
+	}
+	return nil
+}
+
+func (p *Postgresql) DeletedCards(ctx context.Context, userID int, data string) error {
+	query := `UPDATE cards SET deleted = 1 WHERE user_id = $1 AND cards = $2`
+
+	_, err := p.storage.ExecContext(ctx, query, userID, data)
+	if err != nil {
+		p.log.Error("failed to deleted cards", "error", err)
+		return err
+	}
+	return nil
 }
